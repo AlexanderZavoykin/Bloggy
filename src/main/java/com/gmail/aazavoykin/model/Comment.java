@@ -10,10 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Data
@@ -27,14 +25,11 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User author;
+    private User user;
 
     private LocalDateTime created;
 
     @NotBlank
     private String body;
-
-    @OneToMany
-    private List<Comment> comments;
 
 }

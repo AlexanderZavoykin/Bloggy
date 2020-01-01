@@ -11,19 +11,12 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import java.util.List;
 
-@Entity
-@Data
-@NoArgsConstructor
-public class Role {
+public enum Role {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_id")
-    private Long id;
+    ANONYMOUS,
 
-    private String name;
+    USER,
 
-    @ManyToMany(mappedBy = "roles")
-    private List<User> users;
+    ADMIN
 
 }
