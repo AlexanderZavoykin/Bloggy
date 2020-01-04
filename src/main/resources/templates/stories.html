@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Stories</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="all"
+          href="../../css/gtvg.css" th:href="@{/css/gtvg.css}"/>
+</head>
+
+<body>
+<div th:insert="fragments/header :: navbar"></div>
+
+<div th:each="story: ${stories}">
+    <div>
+        <a th:href="'/story/' + ${story.getId()}">
+        <span th:text="${story.getTitle()}"></span>
+    </a>
+        <span> by </span>
+        <a th:href="'/user/' + ${story.getAuthorId()}">
+            <span th:text="${story.getAuthorNickname()}"></span>
+        </a>
+    </div>
+    <div th:text="${story.getCreated()}"></div>
+    <div th:text="${story.getBody()}"></div>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Users</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="all"
+          href="../../css/gtvg.css" th:href="@{/css/gtvg.css}"/>
+</head>
+
+<body>
+<div th:insert="fragments/header :: navbar"></div>
+
+<a th:href="'/user/' + ${user.getId()}">
+    <span th:text="${user.getNickname()}"></span>
+</a>
+
+<div th:text="${user.getInfo()}"></div>
+
+<a th:href="'/user/' + ${user.getId()} + '/stories/'">Stories</a>
+<a th:href="'/user/' + ${user.getId()} + '/comments/'">Comments</a>
+
+
+</body>
+
+</html>
