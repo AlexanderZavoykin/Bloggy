@@ -1,5 +1,6 @@
 package com.gmail.aazavoykin.service;
 
+import com.gmail.aazavoykin.exception.EntityNotFoundException;
 import com.gmail.aazavoykin.model.User;
 import com.gmail.aazavoykin.repository.UserRepository;
 import lombok.NoArgsConstructor;
@@ -21,8 +22,9 @@ public class UserService {
         return (List<User>) userRepository.findAll();
     }
 
-    public Optional<User> getById(Long id) {
-        return userRepository.findById(id);
+    public User getById(Long id) {
+        return userRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("User with id=" + id + " not found"));
     }
 
     public User update(User user) {
