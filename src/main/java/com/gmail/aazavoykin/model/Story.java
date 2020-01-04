@@ -14,6 +14,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,11 +22,12 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
-public class Publication {
+@SequenceGenerator(name="seq", initialValue=1000000, allocationSize=1)
+public class Story {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "publication_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
+    @Column(name = "story_id")
     private Long id;
 
     @ManyToOne
@@ -33,13 +35,13 @@ public class Publication {
     private User user;
 
     @ManyToMany
-    @JoinTable(name = "publication_tag",
-            joinColumns = @JoinColumn(name = "publication_id"),
+    @JoinTable(name = "story_tag",
+            joinColumns = @JoinColumn(name = "story_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private List<Tag> tags;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "publication_id")
+    @JoinColumn(name = "story_id")
     private List<Comment> comments;
 
     private LocalDateTime created;
@@ -48,6 +50,7 @@ public class Publication {
     private String title;
 
     @NotBlank
+    @Column(columnDefinition = "TEXT")
     private String body;
 
 }

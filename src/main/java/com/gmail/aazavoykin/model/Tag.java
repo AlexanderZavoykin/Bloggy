@@ -24,7 +24,7 @@ public class Tag {
     private Long id;
 
     @ManyToMany(mappedBy = "tags")
-    private List<Publication> publications;
+    private List<Story> stories;
 
     private LocalDateTime created;
 
