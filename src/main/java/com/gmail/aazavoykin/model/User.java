@@ -14,25 +14,28 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.List;
 
-@Entity
 @Data
 @NoArgsConstructor
+@Entity
 @Table(name = "users")
+@SequenceGenerator(name="seq", initialValue=1000000, allocationSize=1)
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
     @Column(name = "user_id")
     private Long id;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
-    private List<Publication> publications;
+    private List<Story> stories;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
@@ -42,6 +45,7 @@ public class User {
     private Role role;
 
     @NotBlank
+    @Size(min = 7, max = 20)
     private String username;
 
     @NotBlank
@@ -52,6 +56,7 @@ public class User {
     private String nickname;
 
     @Email
+    @Size(min = 7, max = 20)
     private String email;
 
     private String info;
