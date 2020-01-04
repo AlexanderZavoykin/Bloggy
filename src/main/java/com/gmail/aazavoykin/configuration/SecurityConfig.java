@@ -24,11 +24,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        /*http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests().antMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
-                .antMatchers("/api/**").hasAuthority("ADMIN").*/
-
-
+                .authorizeRequests().antMatchers("/login*", "/swagger-ui/**", "/api-docs/**").permitAll()
+                //.antMatchers("/**").authenticated()
+                //.antMatchers("/**").hasAuthority("USER")
+                .and().httpBasic().realmName("bloggy")
+                .and().formLogin()
+                .loginPage("/login")
+                .loginProcessingUrl("/perform_login")
+                .defaultSuccessUrl("/", true);
     }
+
 }
