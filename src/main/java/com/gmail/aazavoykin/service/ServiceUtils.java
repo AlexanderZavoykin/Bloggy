@@ -13,4 +13,8 @@ public class ServiceUtils {
         return length > limit && limit > 0 ? body.substring(0, limit) + " . . ." : body;
     }
 
+    public static boolean validateMatchingPasswords(String password, String matchingPassword) {
+        return password.equals(matchingPassword);
+    }
+
 }
