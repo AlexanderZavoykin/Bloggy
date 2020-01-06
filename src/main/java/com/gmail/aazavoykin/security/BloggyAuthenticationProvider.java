@@ -39,7 +39,7 @@ public class BloggyAuthenticationProvider implements AuthenticationProvider {
         if (!encoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException("That email and password combination is incorrect.");
         }
-        final List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(Role.USER.name());
+        final List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(Role.USER.getAuthority());
         return new UsernamePasswordAuthenticationToken(user, null, authorities);
     }
 

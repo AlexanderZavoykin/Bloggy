@@ -33,10 +33,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests().antMatchers("/swagger-ui/**", "/api-docs/**").hasAuthority(Role.ADMIN.name())
+                .authorizeRequests().antMatchers("/swagger-ui/**", "/api-docs/**").hasAuthority(Role.ADMIN.getAuthority())
                 .antMatchers("/login", "/sign_up").anonymous()
                 .antMatchers("/user/**").authenticated()
-               .antMatchers("/user/**").hasAuthority(Role.USER.name())
+               .antMatchers("/user/**").hasAuthority(Role.USER.getAuthority())
                 .and().csrf().disable()
                 .formLogin()
                 .loginPage("/login")
