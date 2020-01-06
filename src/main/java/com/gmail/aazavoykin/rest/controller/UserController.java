@@ -26,7 +26,7 @@ public class UserController {
 
     @GetMapping(value = "/user/")
     public ModelAndView all() {
-        ModelAndView modelAndView = new ModelAndView("users");
+        final ModelAndView modelAndView = new ModelAndView("users");
         modelAndView.addObject("users", userService.getAll());
         modelAndView.setStatus(HttpStatus.OK);
         return modelAndView;
@@ -34,7 +34,7 @@ public class UserController {
 
     @GetMapping(value = "/user/{userId}")
     public ModelAndView userInfo(@PathVariable("userId") Long userId) {
-        ModelAndView modelAndView = new ModelAndView("user");
+        final ModelAndView modelAndView = new ModelAndView("user");
         modelAndView.addObject("user", userService.getById(userId));
         modelAndView.setStatus(HttpStatus.OK);
         return modelAndView;
@@ -42,10 +42,10 @@ public class UserController {
 
     @GetMapping(value = "/user/{userId}/stories/")
     public ModelAndView userStories(@PathVariable("userId") Long userId) {
-        List<StoryDto> storyDtos = storyService.getAllByUserId(userId).stream()
+        final List<StoryDto> storyDtos = userService.getById(userId).getStories().stream()
                 .map((story) -> new StoryDto(story, 50))
                 .collect(Collectors.toList());
-        ModelAndView modelAndView = new ModelAndView("stories");
+        final ModelAndView modelAndView = new ModelAndView("stories");
         modelAndView.addObject("stories", storyDtos);
         modelAndView.setStatus(HttpStatus.OK);
         return modelAndView;
@@ -53,7 +53,7 @@ public class UserController {
 
     @GetMapping(value = "/user/{userId}/comments/")
     public ModelAndView userComments(@PathVariable("userId") Long userId) {
-        ModelAndView modelAndView = new ModelAndView("comments");
+        final ModelAndView modelAndView = new ModelAndView("comments");
         modelAndView.addObject("comments", userService.getById(userId).getComments());
         modelAndView.setStatus(HttpStatus.OK);
         return modelAndView;

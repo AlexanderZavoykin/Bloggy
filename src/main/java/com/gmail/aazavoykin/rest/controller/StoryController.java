@@ -28,10 +28,10 @@ public class StoryController {
 
     @GetMapping(value = "/")
     public ModelAndView all() {
-        List<StoryDto> storyDtos = storyService.getAll().stream()
+        final List<StoryDto> storyDtos = storyService.getAll().stream()
                 .map((story) -> new StoryDto(story, 50))
                 .collect(Collectors.toList());
-        ModelAndView modelAndView = new ModelAndView("stories");
+        final ModelAndView modelAndView = new ModelAndView("stories");
         modelAndView.addObject("stories", storyDtos);
         modelAndView.setStatus(HttpStatus.OK);
         return modelAndView;
@@ -39,8 +39,8 @@ public class StoryController {
 
     @GetMapping(value = "/story/{storyId}")
     public ModelAndView getById(@PathVariable("storyId") Long storyId) {
-        Story story = storyService.getById(storyId);
-        ModelAndView modelAndView = new ModelAndView("story");
+        final Story story = storyService.getById(storyId);
+        final ModelAndView modelAndView = new ModelAndView("story");
         modelAndView.addObject("story", new StoryDto(story, 0));
         modelAndView.setStatus(HttpStatus.OK);
         return modelAndView;
@@ -49,14 +49,14 @@ public class StoryController {
     @PreAuthorize("hasAuthority('USER')")
     @PostMapping(value = "/story")
     public ModelAndView create(@Valid @RequestBody StoryDto request) {
-        Story story = new Story();
+        final Story story = new Story();
         story.setTitle(request.getTitle());
         story.setBody(request.getBody());
         story.setTags(request.getTags());
         story.setCreated(LocalDateTime.now());
         // TODO get current user
-        Story publicated = storyService.save(story);
-        ModelAndView modelAndView = new ModelAndView("story");
+        final Story publicated = storyService.save(story);
+        final ModelAndView modelAndView = new ModelAndView("story");
         modelAndView.addObject("story", new StoryDto(publicated, 0));
         modelAndView.setStatus(HttpStatus.CREATED);
         return modelAndView;
