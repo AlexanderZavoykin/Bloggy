@@ -1,39 +1,54 @@
 package com.gmail.aazavoykin.configuration;
 
-import com.gmail.aazavoykin.security.BloggyUserDetailsService;
+import com.gmail.aazavoykin.model.Role;
+import com.gmail.aazavoykin.security.BloggyAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private final BloggyUserDetailsService userDetailsService;
+    private BloggyAuthenticationProvider authenticationProvider;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+        auth.authenticationProvider(authenticationProvider);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests().antMatchers("/login*", "/swagger-ui/**", "/api-docs/**").permitAll()
-                //.antMatchers("/**").authenticated()
-                //.antMatchers("/**").hasAuthority("USER")
-                .and().httpBasic().realmName("bloggy")
-                .and().formLogin()
+        http
+                .authorizeRequests().antMatchers("/swagger-ui/**", "/api-docs/**").hasAuthority(Role.ADMIN.name())
+                .antMatchers("/login", "/sign_up").anonymous()
+                .antMatchers("/user/**").authenticated()
+               .antMatchers("/user/**").hasAuthority(Role.USER.name())
+                .and().csrf().disable()
+                .formLogin()
                 .loginPage("/login")
-                .loginProcessingUrl("/perform_login")
-                .defaultSuccessUrl("/", true);
+                .loginProcessingUrl("/login/process")
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .failureUrl("/login?error=true")
+                .and()
+                .exceptionHandling()
+                .and()
+                .logout()
+                .logoutSuccessUrl("/");
     }
 
 }
