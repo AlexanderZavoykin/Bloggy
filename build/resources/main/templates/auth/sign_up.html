@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Sign up</h1>
+<form action="/sign_up" th:object="${user}" method="POST" enctype="utf8">
+    <div>
+        <label>Username</label>
+        <input th:field="*{username}"/>
+        <p th:each="error: ${#fields.errors('username')}"
+           th:text="${error}">Validation error</p>
+    </div>
+    <div>
+        <label>Nickname</label>
+        <input th:field="*{nickname}"/>
+        <p th:each="error : ${#fields.errors('nickname')}"
+           th:text="${error}">Validation error</p>
+    </div>
+    <div>
+        <label>E-mail</label>
+        <input type="email" th:field="*{email}"/>
+        <p th:each="error : ${#fields.errors('email')}"
+           th:text="${error}">Validation error</p>
+    </div>
+    <div>
+        <label>Info</label>
+        <input type="text" th:field="*{info}"/>
+        <p th:each="error : ${#fields.errors('info')}"
+           th:text="${error}">Validation error</p>
+    </div>
+    <div>
+        <label>Password</label>
+        <input type="password" th:field="*{password}"/>
+        <p th:each="error : ${#fields.errors('password')}"
+           th:text="${error}">Validation error</p>
+    </div>
+    <div>
+        <label>Please, confirm password</label>
+        <input type="password" th:field="*{matchingPassword}"/>
+    </div>
+    <button type="submit">Submit</button>
+</form>
+
+<p>Or just <a href="/login">Sign up</a> if you are already registered</p>
+</body>
+</html>
