@@ -24,7 +24,7 @@ public class UserController {
     @Autowired
     private final UserService userService;
 
-    @GetMapping(value = "/user/")
+    @GetMapping(value = "/user")
     public ModelAndView all() {
         final ModelAndView modelAndView = new ModelAndView("users");
         modelAndView.addObject("users", userService.getAll());
