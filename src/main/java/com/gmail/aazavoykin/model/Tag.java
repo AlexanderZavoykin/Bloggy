@@ -2,6 +2,7 @@ package com.gmail.aazavoykin.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,7 +30,11 @@ public class Tag {
 
     private LocalDateTime created;
 
-    @NotBlank
+    @NotBlank(message = "Tag name can not be blank")
+    @Pattern(message = "Tag name can contain only lowercase letters",
+            regexp = "^[a-z]$")
+    @Column(nullable = false)
+    @Length(min = 6, max = 30, message = "Tag name should have 6 .. 30 characters")
     private String name;
 
 }

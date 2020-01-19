@@ -2,6 +2,7 @@ package com.gmail.aazavoykin.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -22,7 +23,7 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
-@SequenceGenerator(name="seq", initialValue=1000000, allocationSize=1)
+@SequenceGenerator(name = "seq", initialValue = 1000000, allocationSize = 1)
 public class Story {
 
     @Id
@@ -44,13 +45,16 @@ public class Story {
     @JoinColumn(name = "story_id")
     private List<Comment> comments;
 
+    @Column(columnDefinition = "TIMESTAMP DEFAULT NOW()", nullable = false)
     private LocalDateTime created;
 
-    @NotBlank
+    @NotBlank(message = "Title can not be blank")
+    @Column(nullable = false)
+    @Length(min = 6, max = 255, message = "Title should contain from 6 up to 255 symbols")
     private String title;
 
-    @NotBlank
-    @Column(columnDefinition = "TEXT")
+    @NotBlank(message = "Body can not be blank")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String body;
 
 }

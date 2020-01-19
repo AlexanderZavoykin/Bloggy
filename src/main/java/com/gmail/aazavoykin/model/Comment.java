@@ -2,6 +2,7 @@ package com.gmail.aazavoykin.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,7 +30,9 @@ public class Comment {
 
     private LocalDateTime created;
 
-    @NotBlank
+    @NotBlank(message = "Comment can not be blank")
+    @Column(nullable = false)
+    @Length(max = 255, message = "Comment should contain up to 255 letters")
     private String body;
 
 }
