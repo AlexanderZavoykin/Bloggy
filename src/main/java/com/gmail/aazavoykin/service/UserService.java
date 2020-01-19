@@ -35,20 +35,23 @@ public class UserService {
 
     @Transactional
     public User save(UserDto userDto) {
-        if (emailExists(userDto.getEmail())) {
-            throw new EntityAlreadyExistsException("There is already an account with that email: " + userDto.getEmail());
+        final String email = userDto.getEmail().toLowerCase();
+        final String username = userDto.getUsername().toLowerCase();
+        final String nickname = userDto.getNickname().toLowerCase();
+        if (emailExists(email)) {
+            throw new EntityAlreadyExistsException("There is already an account with that email: " + email);
         }
-        if (usernameExists(userDto.getUsername())) {
-            throw new EntityAlreadyExistsException("There is already an account with that username: " + userDto.getUsername());
+        if (usernameExists(username)) {
+            throw new EntityAlreadyExistsException("There is already an account with that username: " + username);
         }
-        if (nicknameExists(userDto.getNickname())) {
-            throw new EntityAlreadyExistsException("There is already an account with that nickname: " + userDto.getNickname());
+        if (nicknameExists(nickname)) {
+            throw new EntityAlreadyExistsException("There is already an account with that nickname: " + nickname);
         }
         final User user = new User();
-        user.setUsername(userDto.getUsername());
+        user.setUsername(username);
         user.setPassword(encoder.encode(userDto.getPassword()));
-        user.setNickname(userDto.getNickname());
-        user.setEmail(userDto.getEmail());
+        user.setNickname(nickname);
+        user.setEmail(email);
         user.setInfo(userDto.getInfo());
         user.setRole(Role.USER);
         user.setStories(null);
