@@ -32,20 +32,20 @@ public class AuthController {
         return new ModelAndView("auth/login");
     }
 
-    @GetMapping("/sign_up")
+    @GetMapping("/registration")
     public ModelAndView getRegistrationForm() {
-        final ModelAndView modelAndView = new ModelAndView("auth/sign_up");
+        final ModelAndView modelAndView = new ModelAndView("auth/registration");
         modelAndView.addObject("user", new UserDto());
         return modelAndView;
     }
 
-    @PostMapping("/sign_up")
+    @PostMapping("/registration")
     public ModelAndView registerUser(@ModelAttribute("user") @Valid UserDto userDto) {
         final User registered = createUserAccount(userDto);
         if (registered == null) {
-            return new ModelAndView("auth/sign_up", "user", userDto);
+            return new ModelAndView("auth/registration", "user", userDto);
         }
-        return new ModelAndView("auth/successful_sign_up", "user", userDto);
+        return new ModelAndView("auth/successful_registration", "user", userDto);
     }
 
     private User createUserAccount(UserDto userDto) {
