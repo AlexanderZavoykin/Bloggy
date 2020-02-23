@@ -1,11 +1,9 @@
 package com.gmail.aazavoykin.rest.dto;
 
-import com.gmail.aazavoykin.model.Story;
-import com.gmail.aazavoykin.model.Tag;
-import com.gmail.aazavoykin.service.ServiceUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Accessors(chain = true)
 public class StoryDto {
 
     private Long id;
@@ -25,18 +24,8 @@ public class StoryDto {
 
     private String created;
 
-    private List<Tag> tags = new ArrayList<>();
+    private List<String> tags = new ArrayList<>();
 
     private String body;
-
-    public StoryDto(Story story, int charsLimit) {
-        id = story.getId();
-        title = story.getTitle();
-        authorNickname = story.getUser().getNickname();
-        authorId = story.getUser().getId();
-        created = story.getCreated().format(ServiceUtils.DATE_TIME_FORMATTER);
-        tags = story.getTags();
-        body = ServiceUtils.cutStoryBody(story.getBody(), charsLimit);
-    }
 
 }

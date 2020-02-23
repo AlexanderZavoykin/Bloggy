@@ -1,2 +1,0 @@
-insert into users values(default, 'abc@test.com', true, 'First blogger', 'Bloggy Joe', '$2a$10$.FHmSr6Bp77q1Fh7/2sDpOlMUrOYcxqVOCV3A6vzxyMSDJ6s5q0Rm', 'USER', 'BloggyJoe');
-insert into users values(default, 'def@test.com', true, 'Second blogger', 'Surfin Bird', '$2a$10$YSq/2QfoyIKcGa8y9haWjeWPPUQRj8CtznBTeIWd8HOgBD/C6v9aK', 'USER', 'SurfinBird');

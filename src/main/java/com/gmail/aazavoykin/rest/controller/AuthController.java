@@ -1,17 +1,13 @@
 package com.gmail.aazavoykin.rest.controller;
 
-import com.gmail.aazavoykin.exception.EntityAlreadyExistsException;
+import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.model.User;
 import com.gmail.aazavoykin.rest.dto.UserDto;
 import com.gmail.aazavoykin.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -52,7 +48,7 @@ public class AuthController {
         final User registered;
         try {
             registered = userService.save(userDto);
-        } catch (EntityAlreadyExistsException e) {
+        } catch (InternalException e) {
             return null;
         }
         return registered;

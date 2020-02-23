@@ -1,7 +1,7 @@
 package com.gmail.aazavoykin.service;
 
-import com.gmail.aazavoykin.exception.EntityAlreadyExistsException;
-import com.gmail.aazavoykin.exception.EntityNotFoundException;
+import com.gmail.aazavoykin.exception.InternalErrorType;
+import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.model.Role;
 import com.gmail.aazavoykin.model.User;
 import com.gmail.aazavoykin.repository.UserRepository;
@@ -30,7 +30,7 @@ public class UserService {
 
     public User getById(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("User with id=" + id + " not found"));
+                new InternalException(InternalErrorType.ENTITY_NOT_FOUND));
     }
 
     @Transactional
@@ -38,14 +38,8 @@ public class UserService {
         final String email = userDto.getEmail().toLowerCase();
         final String username = userDto.getUsername().toLowerCase();
         final String nickname = userDto.getNickname().toLowerCase();
-        if (emailExists(email)) {
-            throw new EntityAlreadyExistsException("There is already an account with that email: " + email);
-        }
-        if (usernameExists(username)) {
-            throw new EntityAlreadyExistsException("There is already an account with that username: " + username);
-        }
-        if (nicknameExists(nickname)) {
-            throw new EntityAlreadyExistsException("There is already an account with that nickname: " + nickname);
+        if (emailExists(email) || usernameExists(username) || nicknameExists(nickname)) {
+            throw new InternalException(InternalErrorType.ENTITY_ALREADY_EXISTS);
         }
         final User user = new User();
         user.setUsername(username);

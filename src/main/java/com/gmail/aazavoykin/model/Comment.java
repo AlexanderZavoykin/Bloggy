@@ -4,13 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
@@ -28,6 +22,7 @@ public class Comment {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(columnDefinition = "TIMESTAMP DEFAULT NOW()", nullable = false)
     private LocalDateTime created;
 
     @NotBlank(message = "Comment can not be blank")

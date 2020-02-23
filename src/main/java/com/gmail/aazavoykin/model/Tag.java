@@ -4,15 +4,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,8 +22,9 @@ public class Tag {
     private Long id;
 
     @ManyToMany(mappedBy = "tags")
-    private List<Story> stories;
+    private List<Story> stories = new ArrayList<>();
 
+    @Column(columnDefinition = "TIMESTAMP DEFAULT NOW()", nullable = false)
     private LocalDateTime created;
 
     @NotBlank(message = "Tag name can not be blank")
@@ -36,5 +33,9 @@ public class Tag {
     @Column(nullable = false)
     @Length(min = 6, max = 30, message = "Tag name should have 6 .. 30 characters")
     private String name;
+
+    public Tag(String name) {
+       this.name = name;
+    }
 
 }
