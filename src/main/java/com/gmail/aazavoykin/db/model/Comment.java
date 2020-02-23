@@ -1,4 +1,4 @@
-package com.gmail.aazavoykin.model;
+package com.gmail.aazavoykin.db.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,13 +8,14 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
-@Entity
 @Data
 @NoArgsConstructor
+@Entity
+@SequenceGenerator(name = "comment_seq", initialValue = 1000000, allocationSize = 1)
 public class Comment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "comment_seq")
     @Column(name = "comment_id")
     private Long id;
 
@@ -25,9 +26,7 @@ public class Comment {
     @Column(columnDefinition = "TIMESTAMP DEFAULT NOW()", nullable = false)
     private LocalDateTime created;
 
-    @NotBlank(message = "Comment can not be blank")
-    @Column(nullable = false)
-    @Length(max = 255, message = "Comment should contain up to 255 letters")
+    @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String body;
 
 }

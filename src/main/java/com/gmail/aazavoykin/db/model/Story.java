@@ -1,4 +1,4 @@
-package com.gmail.aazavoykin.model;
+package com.gmail.aazavoykin.db.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,14 +10,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 @Data
 @NoArgsConstructor
-@SequenceGenerator(name = "seq", initialValue = 1000000, allocationSize = 1)
+@Entity
+@SequenceGenerator(name = "story_seq", initialValue = 1000000, allocationSize = 1)
 public class Story {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "story_seq")
     @Column(name = "story_id")
     private Long id;
 
@@ -38,12 +38,9 @@ public class Story {
     @Column(columnDefinition = "TIMESTAMP DEFAULT NOW()", nullable = false)
     private LocalDateTime created;
 
-    @NotBlank(message = "Title can not be blank")
-    @Column(nullable = false)
-    @Length(min = 6, max = 255, message = "Title should contain from 6 up to 255 symbols")
+    @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String title;
 
-    @NotBlank(message = "Body can not be blank")
     @Column(columnDefinition = "TEXT", nullable = false)
     private String body;
 

@@ -1,6 +1,6 @@
 package com.gmail.aazavoykin.configuration;
 
-import com.gmail.aazavoykin.model.Role;
+import com.gmail.aazavoykin.db.model.enums.RoleName;
 import com.gmail.aazavoykin.security.BloggyAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +32,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests().antMatchers("/swagger-ui/**", "/api-docs/**").hasAuthority(Role.ADMIN.getAuthority())
+                .authorizeRequests().antMatchers("/swagger-ui/**", "/api-docs/**").hasAuthority(RoleName.ADMIN.getAuthority())
                 .antMatchers("/login", "/sign_up").anonymous()
                 .antMatchers("/user/**").authenticated()
-               .antMatchers("/user/**").hasAuthority(Role.USER.getAuthority())
+               .antMatchers("/user/**").hasAuthority(RoleName.USER.getAuthority())
                 .and().csrf().disable()
                 .formLogin()
                 .loginPage("/login")

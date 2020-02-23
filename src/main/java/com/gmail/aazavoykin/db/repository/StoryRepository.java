@@ -1,6 +1,6 @@
-package com.gmail.aazavoykin.repository;
+package com.gmail.aazavoykin.db.repository;
 
-import com.gmail.aazavoykin.model.Story;
+import com.gmail.aazavoykin.db.model.Story;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

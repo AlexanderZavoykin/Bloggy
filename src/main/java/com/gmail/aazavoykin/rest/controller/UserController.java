@@ -40,17 +40,6 @@ public class UserController {
         return modelAndView;
     }
 
-    @GetMapping(value = "/user/{userId}/stories/")
-    public ModelAndView userStories(@PathVariable("userId") Long userId) {
-        final List<StoryDto> storyDtos = userService.getById(userId).getStories().stream()
-                .map((story) -> new StoryDto(story, 50))
-                .collect(Collectors.toList());
-        final ModelAndView modelAndView = new ModelAndView("stories");
-        modelAndView.addObject("stories", storyDtos);
-        modelAndView.setStatus(HttpStatus.OK);
-        return modelAndView;
-    }
-
     @GetMapping(value = "/user/{userId}/comments/")
     public ModelAndView userComments(@PathVariable("userId") Long userId) {
         final ModelAndView modelAndView = new ModelAndView("comments");

@@ -1,7 +1,7 @@
 package com.gmail.aazavoykin.rest.controller;
 
 import com.gmail.aazavoykin.exception.InternalException;
-import com.gmail.aazavoykin.model.User;
+import com.gmail.aazavoykin.db.model.User;
 import com.gmail.aazavoykin.rest.dto.UserDto;
 import com.gmail.aazavoykin.service.UserService;
 import lombok.RequiredArgsConstructor;

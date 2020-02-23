@@ -1,10 +1,9 @@
 package com.gmail.aazavoykin.service;
 
+import com.gmail.aazavoykin.db.model.User;
+import com.gmail.aazavoykin.db.repository.UserRepository;
 import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
-import com.gmail.aazavoykin.model.Role;
-import com.gmail.aazavoykin.model.User;
-import com.gmail.aazavoykin.repository.UserRepository;
 import com.gmail.aazavoykin.rest.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,18 +35,15 @@ public class UserService {
     @Transactional
     public User save(UserDto userDto) {
         final String email = userDto.getEmail().toLowerCase();
-        final String username = userDto.getUsername().toLowerCase();
         final String nickname = userDto.getNickname().toLowerCase();
-        if (emailExists(email) || usernameExists(username) || nicknameExists(nickname)) {
+        if (emailExists(email) || nicknameExists(nickname)) {
             throw new InternalException(InternalErrorType.ENTITY_ALREADY_EXISTS);
         }
         final User user = new User();
-        user.setUsername(username);
-        user.setPassword(encoder.encode(userDto.getPassword()));
         user.setNickname(nickname);
         user.setEmail(email);
         user.setInfo(userDto.getInfo());
-        user.setRole(Role.USER);
+        //user.setRole(RoleName.USER);
         user.setStories(null);
         user.setComments(null);
         return userRepository.save(user);

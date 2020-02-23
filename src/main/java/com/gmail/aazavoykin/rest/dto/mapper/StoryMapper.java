@@ -1,7 +1,7 @@
 package com.gmail.aazavoykin.rest.dto.mapper;
 
-import com.gmail.aazavoykin.model.Story;
-import com.gmail.aazavoykin.model.Tag;
+import com.gmail.aazavoykin.db.model.Story;
+import com.gmail.aazavoykin.db.model.Tag;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;

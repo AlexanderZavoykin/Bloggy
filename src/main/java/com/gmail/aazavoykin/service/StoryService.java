@@ -2,10 +2,10 @@ package com.gmail.aazavoykin.service;
 
 import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
-import com.gmail.aazavoykin.model.Story;
-import com.gmail.aazavoykin.model.Tag;
-import com.gmail.aazavoykin.model.User;
-import com.gmail.aazavoykin.repository.StoryRepository;
+import com.gmail.aazavoykin.db.model.Story;
+import com.gmail.aazavoykin.db.model.Tag;
+import com.gmail.aazavoykin.db.model.User;
+import com.gmail.aazavoykin.db.repository.StoryRepository;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.dto.mapper.StoryMapper;
 import lombok.RequiredArgsConstructor;

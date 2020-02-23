@@ -1,8 +1,8 @@
-package com.gmail.aazavoykin.model;
+package com.gmail.aazavoykin.db.model.enums;
 
 import org.springframework.security.core.GrantedAuthority;
 
-public enum Role implements GrantedAuthority {
+public enum RoleName implements GrantedAuthority {
 
     USER,
 

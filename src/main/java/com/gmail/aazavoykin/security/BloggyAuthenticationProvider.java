@@ -2,9 +2,9 @@ package com.gmail.aazavoykin.security;
 
 import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
-import com.gmail.aazavoykin.model.Role;
-import com.gmail.aazavoykin.model.User;
-import com.gmail.aazavoykin.repository.UserRepository;
+import com.gmail.aazavoykin.db.model.enums.RoleName;
+import com.gmail.aazavoykin.db.model.User;
+import com.gmail.aazavoykin.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -39,7 +39,7 @@ public class BloggyAuthenticationProvider implements AuthenticationProvider {
         if (!encoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException("That email and password combination is incorrect.");
         }
-        final List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(Role.USER.getAuthority());
+        final List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(RoleName.USER.getAuthority());
         return new UsernamePasswordAuthenticationToken(user, null, authorities);
     }
 

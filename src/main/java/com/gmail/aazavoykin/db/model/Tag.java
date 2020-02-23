@@ -1,23 +1,22 @@
-package com.gmail.aazavoykin.model;
+package com.gmail.aazavoykin.db.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 @Data
 @NoArgsConstructor
+@Entity
+@Table(uniqueConstraints = @UniqueConstraint(name = "name_ui", columnNames = {"name"}))
+@SequenceGenerator(name = "tag_seq", initialValue = 1000000, allocationSize = 1)
 public class Tag {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "tag_seq")
     @Column(name = "tag_id")
     private Long id;
 
@@ -27,15 +26,11 @@ public class Tag {
     @Column(columnDefinition = "TIMESTAMP DEFAULT NOW()", nullable = false)
     private LocalDateTime created;
 
-    @NotBlank(message = "Tag name can not be blank")
-    @Pattern(message = "Tag name can contain only lowercase letters",
-            regexp = "^[a-z]$")
-    @Column(nullable = false)
-    @Length(min = 6, max = 30, message = "Tag name should have 6 .. 30 characters")
+    @Column(nullable = false, columnDefinition = "VARCHAR(30)")
     private String name;
 
     public Tag(String name) {
-       this.name = name;
+        this.name = name;
     }
 
 }

@@ -1,6 +1,6 @@
-package com.gmail.aazavoykin.repository;
+package com.gmail.aazavoykin.db.repository;
 
-import com.gmail.aazavoykin.model.User;
+import com.gmail.aazavoykin.db.model.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
