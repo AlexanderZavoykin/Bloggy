@@ -5,32 +5,45 @@ import com.gmail.aazavoykin.db.repository.UserRepository;
 import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.UserDto;
+import com.gmail.aazavoykin.rest.dto.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
-    @Autowired
+    private final UserMapper userMapper;
+
     private final UserRepository userRepository;
 
-    @Autowired
     private final PasswordEncoder encoder;
 
-    public List<User> getAll() {
-        return (List<User>) userRepository.findAll();
-    }
-
-    public User getById(Long id) {
-        return userRepository.findById(id).orElseThrow(() ->
+    @Override
+    public UserDetails loadUserByUsername(String email) {
+        return Optional.ofNullable(userRepository.getByEmail(email)).orElseThrow(() ->
                 new InternalException(InternalErrorType.ENTITY_NOT_FOUND));
     }
+
+    public List<UserDto> getAll() {
+        return userMapper.usersToUserDtos(userRepository.getAllOrderByNickname());
+    }
+
+    public UserDto getByNickname(String nickname) {
+        final User user = Optional.ofNullable(userRepository.getByNickname(nickname)).orElseThrow(() ->
+                new InternalException(InternalErrorType.ENTITY_NOT_FOUND));
+        return userMapper.userToUserDto(user);
+    }
+
+
+    // TODO check all below:
 
     @Transactional
     public User save(UserDto userDto) {
@@ -50,15 +63,11 @@ public class UserService {
     }
 
     private boolean emailExists(String email) {
-        return userRepository.findByEmail(email) != null;
-    }
-
-    private boolean usernameExists(String username) {
-        return userRepository.findByUsername(username) != null;
+        return userRepository.getByEmail(email) != null;
     }
 
     private boolean nicknameExists(String username) {
-        return userRepository.findByNickname(username) != null;
+        return userRepository.getByNickname(username) != null;
     }
 
 }

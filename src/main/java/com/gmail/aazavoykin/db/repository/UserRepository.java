@@ -4,14 +4,16 @@ import com.gmail.aazavoykin.db.model.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    User findByUsername(String username);
+    List<User> getAllOrderByNickname();
 
-    User findByEmail(String email);
+    User getByNickname(String username);
 
-    User findByNickname(String username);
+    User getByEmail(String email);
 
 }
 

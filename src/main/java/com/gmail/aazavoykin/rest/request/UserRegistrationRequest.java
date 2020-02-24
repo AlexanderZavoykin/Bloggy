@@ -12,12 +12,6 @@ import javax.validation.constraints.Size;
 @Data
 public class UserRegistrationRequest {
 
-    @NotBlank(message = "Username cannot be blank")
-    @Pattern(message = "Bad formed username",
-            regexp = "^[a-zA-Z0-9]{8,20}$")
-    @Size(min = 8, max = 20, message = "Username should contain from 8 up to 20 symbols which can be only letters or numbers")
-    private final String username;
-
     @JsonIgnore
     @NotBlank(message = "Password cannot be blank")
     @Pattern(message = "Bad formed password. Password should contain at least one capital letter, " +

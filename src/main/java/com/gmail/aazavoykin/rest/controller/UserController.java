@@ -1,51 +1,53 @@
 package com.gmail.aazavoykin.rest.controller;
 
+import com.gmail.aazavoykin.rest.dto.CommentDto;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
+import com.gmail.aazavoykin.rest.dto.UserDto;
+import com.gmail.aazavoykin.service.CommentService;
 import com.gmail.aazavoykin.service.StoryService;
 import com.gmail.aazavoykin.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    private final StoryService storyService;
-
-    @Autowired
     private final UserService userService;
 
-    @GetMapping(value = "/user")
-    public ModelAndView all() {
-        final ModelAndView modelAndView = new ModelAndView("users");
-        modelAndView.addObject("users", userService.getAll());
-        modelAndView.setStatus(HttpStatus.OK);
-        return modelAndView;
+    private final StoryService storyService;
+
+    private final CommentService commentService;
+
+    @GetMapping(value = "/users")
+    public List<UserDto> all() {
+        return userService.getAll();
     }
 
-    @GetMapping(value = "/user/{userId}")
-    public ModelAndView userInfo(@PathVariable("userId") Long userId) {
-        final ModelAndView modelAndView = new ModelAndView("user");
-        modelAndView.addObject("user", userService.getById(userId));
-        modelAndView.setStatus(HttpStatus.OK);
-        return modelAndView;
+    @GetMapping(value = "/{nickname}")
+    public UserDto userInfo(@PathVariable("nickname") String nickname) {
+        return userService.getByNickname(nickname);
     }
 
-    @GetMapping(value = "/user/{userId}/comments/")
-    public ModelAndView userComments(@PathVariable("userId") Long userId) {
-        final ModelAndView modelAndView = new ModelAndView("comments");
-        modelAndView.addObject("comments", userService.getById(userId).getComments());
-        modelAndView.setStatus(HttpStatus.OK);
-        return modelAndView;
+    @GetMapping("/{nickname}/stories")
+    public List<StoryDto> getStoriesByAuthorNickname(@PathVariable("nickname") String nickname) {
+        return storyService.getAllByUserNickname(nickname);
+    }
+
+    @GetMapping("/{nickname}/stories/rough")
+    public List<StoryDto> getRoughStoriesByAuthorNickname(@PathVariable("nickname") String nickname) {
+        return storyService.getRoughByUserNickname(nickname);
+    }
+
+    @GetMapping("/{nickname}/comments")
+    public List<CommentDto> getCommentsByAuthorNickname(@PathVariable("nickname") String nickname) {
+        return commentService.getAllByAuthorNickname(nickname);
     }
 
 }

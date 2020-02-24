@@ -1,10 +1,8 @@
 package com.gmail.aazavoykin.rest.controller;
 
 import com.gmail.aazavoykin.rest.dto.StoryDto;
-import com.gmail.aazavoykin.rest.dto.mapper.StoryMapper;
 import com.gmail.aazavoykin.service.StoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,7 +12,6 @@ import java.util.List;
 @RequestMapping("/story")
 public class StoryController {
 
-    @Autowired
     private final StoryService storyService;
 
     @GetMapping("/stories")
@@ -39,12 +36,12 @@ public class StoryController {
 
     @PostMapping("/add")
     public StoryDto add(StoryDto dto) {
-        return StoryMapper.INSTANCE.storyToStoryDto(storyService.save(dto));
+        return storyService.save(dto);
     }
 
     @PostMapping("/update")
     public StoryDto update(StoryDto dto) {
-        return StoryMapper.INSTANCE.storyToStoryDto(storyService.update(dto));
+        return storyService.update(dto);
     }
 
     @PostMapping("/delete/{id}")

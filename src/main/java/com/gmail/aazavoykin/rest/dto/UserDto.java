@@ -28,8 +28,4 @@ public class UserDto {
     @Length(max = 255, message = "User info should contain up to 255 symbols")
     private String info;
 
-    private Map<Long, String> stories;
-
-    private Map<Long, String> comments;
-
 }

@@ -1,83 +1,104 @@
 package com.gmail.aazavoykin.service;
 
-import com.gmail.aazavoykin.exception.InternalErrorType;
-import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.db.model.Story;
 import com.gmail.aazavoykin.db.model.Tag;
 import com.gmail.aazavoykin.db.model.User;
 import com.gmail.aazavoykin.db.repository.StoryRepository;
+import com.gmail.aazavoykin.db.repository.UserRepository;
+import com.gmail.aazavoykin.exception.InternalErrorType;
+import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.dto.mapper.StoryMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 
 public class StoryService {
 
-    @Autowired
+    private final StoryMapper storyMapper;
+
     private final StoryRepository storyRepository;
 
+    private final UserRepository userRepository;
+
     public List<StoryDto> getAll() {
-        return StoryMapper.INSTANCE.storiesToStoryDtos(storyRepository.all());
+        return storyMapper.storiesToStoryDtos(storyRepository.getAllByRoughFalseOrderByCreatedDesc());
     }
 
     public List<StoryDto> getLast10() {
-        return StoryMapper.INSTANCE.storiesToStoryDtos(storyRepository.getFirst10ByOrderByCreated());
+        return storyMapper.storiesToStoryDtos(storyRepository.getTop10ByRoughFalseOrderByCreatedDesc());
     }
 
     public StoryDto getById(Long id) {
         final Story story = storyRepository.findById(id).orElseThrow(() ->
                 new InternalException(InternalErrorType.ENTITY_NOT_FOUND));
-        return StoryMapper.INSTANCE.storyToStoryDto(story);
+        return storyMapper.storyToStoryDto(story);
     }
 
     public List<StoryDto> getAlByTag(String tagName) {
-        return StoryMapper.INSTANCE.storiesToStoryDtos(storyRepository.getAllByTagName(tagName));
+        return storyMapper.storiesToStoryDtos(storyRepository.getAllByTagName(tagName));
     }
 
-    public List<Story> getAllByUserId(Long userId) {
-        return storyRepository.getAllByUser(userId);
+    public List<StoryDto> getAllByUserNickname(String nickname) {
+        return storyMapper.storiesToStoryDtos(storyRepository.getAllByUserNicknameAndRoughFalse(nickname));
     }
 
-    public Story save(StoryDto dto) {
-        final User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public List<StoryDto> getRoughByUserNickname(String nickname) {
+        return storyMapper.storiesToStoryDtos(storyRepository.getAllByUserNicknameAndRoughTrue(nickname));
+    }
+
+    public StoryDto save(StoryDto dto) {
+        final User user = checkAuthorized();
         final Story story = new Story();
         story.setUser(user);
         story.setTitle(dto.getTitle());
         story.setBody(dto.getBody());
         story.setTags(dto.getTags().stream().map(Tag::new).collect(Collectors.toList()));
-        return storyRepository.save(story);
+        final Story saved = storyRepository.save(story);
+        log.debug("Saving new story {}", saved);
+        return storyMapper.storyToStoryDto(saved);
     }
 
-    public Story update(StoryDto dto) {
-        checkIsAvailibleForUser(dto.getId());
+    public StoryDto update(StoryDto dto) {
+        final User user = checkAuthorized();
+        checkAvailibleForUser(user, dto.getId());
         final Story found = Optional.ofNullable(storyRepository.getById(dto.getId()))
                 .orElseThrow(() -> new InternalException(InternalErrorType.ENTITY_NOT_FOUND));
         found.setTitle(dto.getTitle());
         found.setBody(dto.getBody());
         found.setTags(dto.getTags().stream().map(Tag::new).collect(Collectors.toList()));
-        return storyRepository.save(found);
+        log.debug("Updating new story {}", found);
+        return storyMapper.storyToStoryDto(storyRepository.save(found));
     }
 
     public void delete(Long id) {
-        checkIsAvailibleForUser(id);
+        final User user = checkAuthorized();
+        checkAvailibleForUser(user, id);
+        log.debug("Deleting story {}", id);
         storyRepository.deleteById(id);
     }
 
-    private void checkIsAvailibleForUser(Long storyId) {
-        final User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final boolean ofUser = storyRepository.getAllByUser(user.getId()).stream()
-                .map(Story::getId)
-                .anyMatch(id -> id.equals(storyId));
-        if (!ofUser) {
+    private User checkAuthorized() {
+        final UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return Optional.ofNullable(userRepository.getByEmail(principal.getUsername())).orElseThrow(() -> {
+            log.error("Tried to operate story by unauthorized user");
+            throw new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE);
+        });
+    }
+
+    private void checkAvailibleForUser(User user, Long storyId) {
+        if (storyRepository.getStoryIdsByUserId(user.getId()).stream().noneMatch(id -> id.equals(storyId))) {
+            log.error("Tried to operate story {} by another user {}", storyId, user);
             throw new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE);
         }
     }

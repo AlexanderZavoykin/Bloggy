@@ -1,14 +1,14 @@
 package com.gmail.aazavoykin.db.repository;
 
-import com.gmail.aazavoykin.db.model.Tag;
+import com.gmail.aazavoykin.db.model.Comment;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface TagRepository extends CrudRepository<Tag, Long> {
+public interface CommentRepository extends CrudRepository<Comment, Long> {
 
-    List<Tag> getAllOrderByName();
+    List<Comment> getAllByUserNickname(String nickname);
 
 }
