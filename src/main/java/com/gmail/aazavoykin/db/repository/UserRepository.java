@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    List<User> getAllOrderByNickname();
+    List<User> getAllByOrderByNickname();
 
     User getByNickname(String username);
 

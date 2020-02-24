@@ -92,7 +92,7 @@ public class StoryService {
         final UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return Optional.ofNullable(userRepository.getByEmail(principal.getUsername())).orElseThrow(() -> {
             log.error("Tried to operate story by unauthorized user");
-            throw new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE);
+            return new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE);
         });
     }
 

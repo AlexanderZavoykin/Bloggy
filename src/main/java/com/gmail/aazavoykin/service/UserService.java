@@ -33,7 +33,7 @@ public class UserService implements UserDetailsService {
     }
 
     public List<UserDto> getAll() {
-        return userMapper.usersToUserDtos(userRepository.getAllOrderByNickname());
+        return userMapper.usersToUserDtos(userRepository.getAllByOrderByNickname());
     }
 
     public UserDto getByNickname(String nickname) {

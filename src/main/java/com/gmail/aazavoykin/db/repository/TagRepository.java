@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface TagRepository extends CrudRepository<Tag, Long> {
 
-    List<Tag> getAllOrderByName();
+    List<Tag> getAllByOrderByName();
 
 }

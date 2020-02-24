@@ -44,7 +44,7 @@ public class Story {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String body;
 
-    @Column(columnDefinition = "BOOLEAN DEFAULT TRUE")
+    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean rough;
 
 }

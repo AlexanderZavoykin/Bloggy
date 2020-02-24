@@ -17,7 +17,7 @@ public class TagService {
     private final TagRepository tagRepository;
 
     public List<TagDto> getAll() {
-       return tagMapper.tagsToTagDtos(tagRepository.getAllOrderByName());
+       return tagMapper.tagsToTagDtos(tagRepository.getAllByOrderByName());
     }
 
 }
