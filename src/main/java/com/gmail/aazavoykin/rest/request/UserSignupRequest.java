@@ -10,7 +10,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Data
-public class UserRegistrationRequest {
+public class UserSignupRequest {
 
     @JsonIgnore
     @NotBlank(message = "Password cannot be blank")
@@ -37,8 +37,5 @@ public class UserRegistrationRequest {
             regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
     @Size(max = 120, message = "Password should contain up to 80 symbols")
     private final String email;
-
-    @Length(max = 255, message = "User info should contain up to 255 symbols")
-    private final String info;
 
 }

@@ -7,9 +7,16 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum InternalErrorType {
 
-    ENTITY_NOT_FOUND("E001", "Entity not found"),
-    ENTITY_ALREADY_EXISTS("E002","Entity already exists"),
-    OPERATION_NOT_AVAILABLE("E003", "Operation is not available for this user");
+    USER_NOT_FOUND("E001", "User not found"),
+    STORY_NOT_FOUND("E002", "Story not found"),
+    TAG_NOT_FOUND("E003", "Tag not found"),
+    COMMENT_NOT_FOUND("E004", "Comment not found"),
+    USER_ALREADY_EXISTS("E002", "User already exists"),
+    TAG_ALREADY_EXISTS("E003","Tag already exists"),
+
+    OPERATION_NOT_AVAILABLE("E009", "Operation is not available for this user"),
+
+    NOT_VALID_ARGUMENT("S001", "Argument is not valid");
 
     private final String code;
 

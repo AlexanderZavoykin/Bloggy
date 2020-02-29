@@ -14,13 +14,4 @@ import java.io.IOException;
 @ControllerAdvice
 public class ExceptionHandlerController extends DefaultHandlerExceptionResolver {
 
-    @ExceptionHandler(BindException.class)
-    @Override
-    protected ModelAndView handleBindException(BindException ex, HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
-        final ModelAndView modelAndView = new ModelAndView("exception");
-        modelAndView.setStatus(HttpStatus.BAD_REQUEST);
-        modelAndView.addObject("errors", ex.getFieldErrors());
-        return modelAndView;
-    }
-
 }

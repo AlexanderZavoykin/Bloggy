@@ -1,19 +1,15 @@
 package com.gmail.aazavoykin.util;
 
+import com.gmail.aazavoykin.exception.InternalErrorType;
+import com.gmail.aazavoykin.exception.InternalException;
+
 public class ValidationUtils {
 
-    public static Throwable getRootCause(Throwable t) {
-        Throwable result = t;
-        Throwable cause;
-
-        while (null != (cause = result.getCause()) && (result != cause)) {
-            result = cause;
+    public static boolean checkMatchingPassword(String password, String matchingPassword) {
+        if (password.isEmpty() || matchingPassword.isEmpty()) {
+            throw new InternalException(InternalErrorType.NOT_VALID_ARGUMENT);
         }
-        return result;
-    }
-
-    public static String getMessage(Throwable e) {
-        return e.getLocalizedMessage() != null ? e.getLocalizedMessage() : e.getClass().getName();
+        return password.equals(matchingPassword);
     }
 
 }

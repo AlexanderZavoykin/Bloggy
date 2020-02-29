@@ -8,6 +8,7 @@ buildscript {
 }
 
 plugins {
+    id 'org.springframework.boot' version '2.2.5.RELEASE'
     id 'net.ltgt.apt' version '0.20'
 }
 

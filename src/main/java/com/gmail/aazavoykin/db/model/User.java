@@ -3,6 +3,7 @@ package com.gmail.aazavoykin.db.model;
 import com.gmail.aazavoykin.db.model.enums.Role;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 @Data
+@Accessors(chain = true)
 @NoArgsConstructor
 @Entity
 @Table(name = "users",
