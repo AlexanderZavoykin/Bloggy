@@ -1,6 +1,7 @@
 package com.gmail.aazavoykin.rest.controller;
 
 import com.gmail.aazavoykin.rest.dto.StoryDto;
+import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.StoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,38 +16,39 @@ public class StoryController {
     private final StoryService storyService;
 
     @GetMapping("stories")
-    public List<StoryDto> all() {
-        return storyService.getAll();
+    public Response<List<StoryDto>> all() {
+        return Response.success(storyService.getAll());
     }
 
     @GetMapping("last10")
-    public List<StoryDto> last10() {
-        return storyService.getLast10();
+    public Response<List<StoryDto>> last10() {
+        return Response.success(storyService.getLast10());
     }
 
     @GetMapping("{id}")
-    public StoryDto getById(@PathVariable("id") Long id) {
-        return storyService.getById(id);
+    public Response<StoryDto> getById(@PathVariable("id") Long id) {
+        return Response.success(storyService.getById(id));
     }
 
     @GetMapping("tag/{tag}")
-    public List<StoryDto> getByTag(@PathVariable("tag") String tagname) {
-        return storyService.getAlByTag(tagname);
+    public Response<List<StoryDto>> getByTag(@PathVariable("tag") String tagname) {
+        return Response.success(storyService.getAlByTag(tagname));
     }
 
     @PostMapping("add")
-    public StoryDto add(StoryDto dto) {
-        return storyService.save(dto);
+    public Response<StoryDto> add(StoryDto dto) {
+        return Response.success(storyService.save(dto));
     }
 
     @PostMapping("update")
-    public StoryDto update(StoryDto dto) {
-        return storyService.update(dto);
+    public Response<StoryDto> update(StoryDto dto) {
+        return Response.success(storyService.update(dto));
     }
 
     @PostMapping("delete/{id}")
-    public void delete(@PathVariable("id") Long id) {
+    public Response<Void> delete(@PathVariable("id") Long id) {
         storyService.delete(id);
+        return Response.success();
     }
 
 }

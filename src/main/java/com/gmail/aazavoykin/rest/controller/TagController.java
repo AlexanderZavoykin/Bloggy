@@ -1,6 +1,7 @@
 package com.gmail.aazavoykin.rest.controller;
 
 import com.gmail.aazavoykin.rest.dto.TagDto;
+import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +18,8 @@ public class TagController {
     private final TagService tagService;
 
     @GetMapping("tags")
-    public List<TagDto> getAll() {
-        return tagService.getAll();
+    public Response<List<TagDto>> getAll() {
+        return Response.success(tagService.getAll());
     }
 
 }

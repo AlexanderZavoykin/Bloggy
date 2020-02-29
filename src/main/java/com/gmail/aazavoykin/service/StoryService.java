@@ -41,7 +41,7 @@ public class StoryService {
 
     public StoryDto getById(Long id) {
         final Story story = storyRepository.findById(id).orElseThrow(() ->
-                new InternalException(InternalErrorType.ENTITY_NOT_FOUND));
+                new InternalException(InternalErrorType.STORY_NOT_FOUND));
         return storyMapper.storyToStoryDto(story);
     }
 
@@ -73,7 +73,7 @@ public class StoryService {
         final User user = checkAuthorized();
         checkAvailibleForUser(user, dto.getId());
         final Story found = Optional.ofNullable(storyRepository.getById(dto.getId()))
-                .orElseThrow(() -> new InternalException(InternalErrorType.ENTITY_NOT_FOUND));
+                .orElseThrow(() -> new InternalException(InternalErrorType.STORY_NOT_FOUND));
         found.setTitle(dto.getTitle());
         found.setBody(dto.getBody());
         found.setTags(dto.getTags().stream().map(Tag::new).collect(Collectors.toList()));

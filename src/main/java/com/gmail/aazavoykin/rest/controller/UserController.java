@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 import static com.gmail.aazavoykin.util.ValidationUtils.*;
@@ -30,38 +31,45 @@ public class UserController {
     private final CommentService commentService;
 
     @GetMapping(value = "users")
-    public List<UserDto> all() {
-        return userService.getAll();
+    public Response<List<UserDto>> all() {
+        return Response.success(userService.getAll());
     }
 
     @GetMapping(value = "{nickname}")
-    public UserDto userInfo(@PathVariable("nickname") String nickname) {
-        return userService.getByNickname(nickname);
+    public Response<UserDto> userInfo(@PathVariable("nickname") String nickname) {
+        return Response.success(userService.getByNickname(nickname));
     }
 
     @GetMapping("{nickname}/stories")
-    public List<StoryDto> getStoriesByAuthorNickname(@PathVariable("nickname") String nickname) {
-        return storyService.getAllByUserNickname(nickname);
+    public Response<List<StoryDto>> getStoriesByAuthorNickname(@PathVariable("nickname") String nickname) {
+        return Response.success(storyService.getAllByUserNickname(nickname));
     }
 
     @GetMapping("{nickname}/stories/rough")
-    public List<StoryDto> getRoughStoriesByAuthorNickname(@PathVariable("nickname") String nickname) {
-        return storyService.getRoughByUserNickname(nickname);
+    public Response<List<StoryDto>> getRoughStoriesByAuthorNickname(@PathVariable("nickname") String nickname) {
+        return Response.success(storyService.getRoughByUserNickname(nickname));
     }
 
     @GetMapping("{nickname}/comments")
-    public List<CommentDto> getCommentsByAuthorNickname(@PathVariable("nickname") String nickname) {
-        return commentService.getAllByAuthorNickname(nickname);
+    public Response<List<CommentDto>> getCommentsByAuthorNickname(@PathVariable("nickname") String nickname) {
+        return Response.success(commentService.getAllByAuthorNickname(nickname));
     }
 
     @PostMapping("signup")
     public Response<Void> signup(@Valid @RequestBody UserSignupRequest request) {
-        checkMatchingPassword(request.getPassword(), request.getMatchingPassword());
-        try {
-            userService.add(request);
-        } catch (InternalException e) {
-            return Response.error(e);
-        }
+        userService.add(request);
+        return Response.success();
+    }
+
+    @PostMapping("activate/{token}")
+    public Response<Void> activate(@PathVariable String token) {
+        userService.activate(token);
+        return Response.success();
+    }
+
+    @PostMapping("update")
+    public Response<Void> updateInfo(Principal principal, @RequestBody String info) {
+        userService.updateInfo(principal, info);
         return Response.success();
     }
 
