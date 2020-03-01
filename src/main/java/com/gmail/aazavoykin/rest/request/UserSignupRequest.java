@@ -33,6 +33,7 @@ public class UserSignupRequest {
     @Size(min = 8, max = 20, message = "Nickname should contain from 8 up to 20 symbols (letters, numbers, '_', '-'")
     private final String nickname;
 
+    @NotBlank(message = "Nickname cannot be blank")
     @Email(message = "Email address has invalid format",
             regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
     @Size(max = 120, message = "Password should contain up to 80 symbols")

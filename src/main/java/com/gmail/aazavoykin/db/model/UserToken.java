@@ -25,7 +25,7 @@ public class UserToken {
     @Column(columnDefinition = "VARCHAR(16)", nullable = false)
     private String token;
 
-    @Column(name = "expiry_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_DATE + INTERVAL '3 DAY'", nullable = false)
+    @Column(name = "expiry_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_DATE + INTERVAL '3 DAYS'", nullable = false)
     private LocalDate expiryDate;
 
 }

@@ -1,23 +1,20 @@
 package com.gmail.aazavoykin.rest.controller;
 
-import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.CommentDto;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.dto.UserDto;
+import com.gmail.aazavoykin.rest.request.UserLoginRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.CommentService;
 import com.gmail.aazavoykin.service.StoryService;
 import com.gmail.aazavoykin.service.UserService;
-import com.gmail.aazavoykin.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
-
-import static com.gmail.aazavoykin.util.ValidationUtils.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -70,6 +67,12 @@ public class UserController {
     @PostMapping("update")
     public Response<Void> updateInfo(Principal principal, @RequestBody String info) {
         userService.updateInfo(principal, info);
+        return Response.success();
+    }
+
+    @PostMapping("login")
+    public Response<Void> login(@RequestBody UserLoginRequest request) {
+        userService.login(request);
         return Response.success();
     }
 

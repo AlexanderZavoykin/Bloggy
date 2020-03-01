@@ -3,12 +3,14 @@ package com.gmail.aazavoykin.service;
 import com.gmail.aazavoykin.db.model.User;
 import com.gmail.aazavoykin.db.model.UserToken;
 import com.gmail.aazavoykin.db.model.enums.Role;
+import com.gmail.aazavoykin.db.repository.LoginAttemptRepository;
 import com.gmail.aazavoykin.db.repository.UserRepository;
 import com.gmail.aazavoykin.db.repository.UserTokenRepository;
 import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.UserDto;
 import com.gmail.aazavoykin.rest.dto.mapper.UserMapper;
+import com.gmail.aazavoykin.rest.request.UserLoginRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.*;
@@ -33,6 +34,8 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
     private final UserTokenRepository tokenRepository;
+
+    private final LoginAttemptRepository loginAttemptRepository;
 
     private final PasswordEncoder encoder;
 
@@ -56,8 +59,8 @@ public class UserService implements UserDetailsService {
         final String email = request.getEmail();
         final String nickname = request.getNickname();
         ValidationUtils.checkMatchingPassword(request.getPassword(), request.getMatchingPassword());
-        checkEmailExists(email);
-        checkNicknameExists(nickname);
+        checkEmailNotExists(email);
+        checkNicknameNotExists(nickname);
         final User user = new User()
                 .setStories(new ArrayList<>())
                 .setComments(new ArrayList<>())
@@ -80,7 +83,7 @@ public class UserService implements UserDetailsService {
         final UserToken foundToken = Optional.ofNullable(tokenRepository.findByToken(token))
                 .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_NOT_FOUND));
         Optional.of(foundToken).filter(userToken -> LocalDate.now().isBefore(userToken.getExpiryDate()))
-        .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_DATE_EXPIRED));
+                .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_DATE_EXPIRED));
         final User user = foundToken.getUser();
         user.setEnabled(true);
         userRepository.save(user);
@@ -90,14 +93,24 @@ public class UserService implements UserDetailsService {
         userRepository.updateInfo(((User) principal).getId(), info);
     }
 
-    public void checkEmailExists(String email) {
-        Optional.ofNullable(userRepository.getByEmail(email)).orElseThrow(() ->
-                new InternalException(InternalErrorType.USER_ALREADY_EXISTS));
+    public void login(UserLoginRequest request) {
+        final User found = userRepository.getByEmail(request.getEmail().toLowerCase());
+        if (found == null) {
+            throw new InternalException(InternalErrorType.USER_NOT_FOUND);
+        }
+
     }
 
-    public void checkNicknameExists(String nickname) {
-        Optional.ofNullable(userRepository.getByNickname(nickname)).orElseThrow(() ->
-                new InternalException(InternalErrorType.USER_ALREADY_EXISTS));
+    private void checkEmailNotExists(String email) {
+        if (userRepository.getByEmail(email) != null) {
+            throw new InternalException(InternalErrorType.USER_ALREADY_EXISTS);
+        }
+    }
+
+    private void checkNicknameNotExists(String nickname) {
+        if (userRepository.getByNickname(nickname) != null) {
+            throw new InternalException(InternalErrorType.USER_ALREADY_EXISTS);
+        }
     }
 
 }
