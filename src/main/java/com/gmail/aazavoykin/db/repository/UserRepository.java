@@ -13,6 +13,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     List<User> getAllByOrderByNickname();
 
+    User getById(Long id);
+
     User getByNickname(String username);
 
     User getByEmail(String email);

@@ -1,5 +1,6 @@
 package com.gmail.aazavoykin.service;
 
+import com.gmail.aazavoykin.db.model.LoginAttempt;
 import com.gmail.aazavoykin.db.model.User;
 import com.gmail.aazavoykin.db.model.UserToken;
 import com.gmail.aazavoykin.db.model.enums.Role;
@@ -10,7 +11,6 @@ import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.UserDto;
 import com.gmail.aazavoykin.rest.dto.mapper.UserMapper;
-import com.gmail.aazavoykin.rest.request.UserLoginRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +47,10 @@ public class UserService implements UserDetailsService {
 
     public List<UserDto> getAll() {
         return userMapper.usersToUserDtos(userRepository.getAllByOrderByNickname());
+    }
+
+    public User getByEmail(String email) {
+        return userRepository.getByEmail(email);
     }
 
     public UserDto getByNickname(String nickname) {
@@ -89,16 +93,19 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
+    public void setEnabled(User user, boolean enabled) {
+        userRepository.save(user.setEnabled(enabled));
+    }
+
     public void updateInfo(Principal principal, String info) {
         userRepository.updateInfo(((User) principal).getId(), info);
     }
 
-    public void login(UserLoginRequest request) {
-        final User found = userRepository.getByEmail(request.getEmail().toLowerCase());
-        if (found == null) {
-            throw new InternalException(InternalErrorType.USER_NOT_FOUND);
-        }
-
+    public Long insertLoginAttempt(Long userId, boolean success) {
+        loginAttemptRepository.save(new LoginAttempt()
+                .setUser(userRepository.getById(userId))
+                .setSuccess(success));
+        return loginAttemptRepository.countFailedLoginAttemptsLast30Mins(userId);
     }
 
     private void checkEmailNotExists(String email) {

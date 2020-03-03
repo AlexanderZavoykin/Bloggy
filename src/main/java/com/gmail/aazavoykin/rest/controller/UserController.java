@@ -70,10 +70,4 @@ public class UserController {
         return Response.success();
     }
 
-    @PostMapping("login")
-    public Response<Void> login(@RequestBody UserLoginRequest request) {
-        userService.login(request);
-        return Response.success();
-    }
-
 }
