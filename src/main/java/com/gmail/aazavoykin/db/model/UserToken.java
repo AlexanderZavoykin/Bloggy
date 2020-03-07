@@ -9,7 +9,10 @@ import java.time.LocalDate;
 @Data
 @Accessors(chain = true)
 @Entity
-@Table(name = "user_token")
+@Table(name = "user_token",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "user_id_ui", columnNames = {"user_id"})
+        })
 @SequenceGenerator(name = "user_token_seq", initialValue = 1000000, allocationSize = 1)
 public class UserToken {
 

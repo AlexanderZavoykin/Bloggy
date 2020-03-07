@@ -11,10 +11,12 @@ import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.UserDto;
 import com.gmail.aazavoykin.rest.dto.mapper.UserMapper;
+import com.gmail.aazavoykin.rest.request.ResetPasswordRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +32,8 @@ import java.util.*;
 public class UserService implements UserDetailsService {
 
     private final UserMapper userMapper;
+
+    private final MailService mailService;
 
     private final UserRepository userRepository;
 
@@ -76,11 +80,10 @@ public class UserService implements UserDetailsService {
                 .setEnabled(false);
         user.getRoles().add(Role.USER);
         final User savedUser = userRepository.save(user);
-        final UserToken token = new UserToken()
+        final UserToken savedToken = tokenRepository.save(new UserToken()
                 .setUser(savedUser)
-                .setToken(UUID.randomUUID().toString());
-        tokenRepository.save(token);
-        // TODO add service to generate activation url and send it to user`s email
+                .setToken(UUID.randomUUID().toString()));
+        mailService.sendVerificationUrl(savedUser.getEmail(), savedToken.getToken());
     }
 
     public void activate(String token) {
@@ -90,7 +93,25 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_DATE_EXPIRED));
         final User user = foundToken.getUser();
         user.setEnabled(true);
-        userRepository.save(user);
+        mailService.sendSuccessfulRegistrationConfirmation(user.getEmail());
+    }
+
+    public void sendResetPasswordUrl(String email) {
+        final User user = Optional.ofNullable(userRepository.getByEmail(email))
+                .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+        final UserToken token = Optional.ofNullable(tokenRepository.findByUser(user.getId()))
+                .orElseGet(() -> tokenRepository.save(new UserToken()
+                        .setUser(user)));
+        token.setToken(UUID.randomUUID().toString());
+        mailService.sendPasswordResetUrl(email, token.getToken());
+    }
+
+    public void resetPassword(ResetPasswordRequest request, String email) {
+        final String newPassword = request.getPassword();
+        final User user = Optional.ofNullable(userRepository.getByEmail(email))
+                .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+        ValidationUtils.checkMatchingPassword(request.getPassword(), request.getMatchingPassword());
+        user.setPassword(newPassword);
     }
 
     public void setEnabled(User user, boolean enabled) {

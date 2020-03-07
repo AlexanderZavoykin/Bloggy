@@ -3,6 +3,7 @@ package com.gmail.aazavoykin.rest.controller;
 import com.gmail.aazavoykin.rest.dto.CommentDto;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.dto.UserDto;
+import com.gmail.aazavoykin.rest.request.ResetPasswordRequest;
 import com.gmail.aazavoykin.rest.request.UserLoginRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.rest.response.Response;
@@ -61,6 +62,18 @@ public class UserController {
     @PostMapping("activate/{token}")
     public Response<Void> activate(@PathVariable String token) {
         userService.activate(token);
+        return Response.success();
+    }
+
+    @PostMapping("password/forgot")
+    public Response<Void> forgotPassword(@RequestBody String email) {
+        userService.sendResetPasswordUrl(email);
+        return Response.success();
+    }
+
+    @PostMapping("password/reset")
+    public Response<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request, @RequestParam("email") String email) {
+        userService.resetPassword(request, email);
         return Response.success();
     }
 

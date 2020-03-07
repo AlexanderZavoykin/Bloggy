@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bloggydb
+    username: bloggy
+    password: bloggy
+    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
+  properties:
+    hibernate:
+      format_sql: true
+
+app:
+  hostname:
+
+email:
+  smtp:
+    host: a
+    port: 993
+  username: a
+  password: b
+  template:
+    auth:
+      activation:
+        subject:
+        body:
+      confirmation:
+        subject:
+        body:
+      reset:
+        subject:
+        body:
+
+
+
