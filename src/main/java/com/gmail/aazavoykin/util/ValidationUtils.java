@@ -10,5 +10,4 @@ public class ValidationUtils {
             throw new InternalException(InternalErrorType.PASSWORDS_NOT_MATCH);
         }
     }
-
 }

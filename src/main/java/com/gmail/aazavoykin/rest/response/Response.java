@@ -1,7 +1,6 @@
 package com.gmail.aazavoykin.rest.response;
 
 import com.gmail.aazavoykin.exception.InternalException;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.http.HttpStatus;
@@ -11,9 +10,7 @@ import org.springframework.http.HttpStatus;
 public class Response<T> {
 
     private T body;
-
     private String message;
-
     private HttpStatus httpStatus;
 
     private Response(T body, String message, HttpStatus httpStatus) {
@@ -33,5 +30,4 @@ public class Response<T> {
     public static <T> Response<T> error(InternalException e) {
         return new Response<>(null, e.getErrorType().getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 }

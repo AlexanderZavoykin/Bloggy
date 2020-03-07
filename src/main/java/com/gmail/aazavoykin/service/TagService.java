@@ -13,11 +13,9 @@ import java.util.List;
 public class TagService {
 
     private final TagMapper tagMapper;
-
     private final TagRepository tagRepository;
 
     public List<TagDto> getAll() {
-       return tagMapper.tagsToTagDtos(tagRepository.getAllByOrderByName());
+        return tagMapper.tagsToTagDtos(tagRepository.getAllByOrderByName());
     }
-
 }

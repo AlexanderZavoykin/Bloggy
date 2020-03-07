@@ -16,7 +16,6 @@ import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +23,11 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -32,21 +35,16 @@ import java.util.*;
 public class UserService implements UserDetailsService {
 
     private final UserMapper userMapper;
-
     private final MailService mailService;
-
     private final UserRepository userRepository;
-
     private final UserTokenRepository tokenRepository;
-
     private final LoginAttemptRepository loginAttemptRepository;
-
     private final PasswordEncoder encoder;
 
     @Override
     public UserDetails loadUserByUsername(String email) {
         return Optional.ofNullable(userRepository.getByEmail(email)).orElseThrow(() ->
-                new InternalException(InternalErrorType.USER_NOT_FOUND));
+            new InternalException(InternalErrorType.USER_NOT_FOUND));
     }
 
     public List<UserDto> getAll() {
@@ -59,7 +57,7 @@ public class UserService implements UserDetailsService {
 
     public UserDto getByNickname(String nickname) {
         final User user = Optional.ofNullable(userRepository.getByNickname(nickname)).orElseThrow(() ->
-                new InternalException(InternalErrorType.USER_NOT_FOUND));
+            new InternalException(InternalErrorType.USER_NOT_FOUND));
         return userMapper.userToUserDto(user);
     }
 
@@ -70,27 +68,27 @@ public class UserService implements UserDetailsService {
         checkEmailNotExists(email);
         checkNicknameNotExists(nickname);
         final User user = new User()
-                .setStories(new ArrayList<>())
-                .setComments(new ArrayList<>())
-                .setRoles(new HashSet<>())
-                .setEmail(email)
-                .setPassword(encoder.encode(request.getPassword()))
-                .setNickname(nickname)
-                .setInfo("A newbie")
-                .setEnabled(false);
+            .setStories(new ArrayList<>())
+            .setComments(new ArrayList<>())
+            .setRoles(new HashSet<>())
+            .setEmail(email)
+            .setPassword(encoder.encode(request.getPassword()))
+            .setNickname(nickname)
+            .setInfo("A newbie")
+            .setEnabled(false);
         user.getRoles().add(Role.USER);
         final User savedUser = userRepository.save(user);
         final UserToken savedToken = tokenRepository.save(new UserToken()
-                .setUser(savedUser)
-                .setToken(UUID.randomUUID().toString()));
+            .setUser(savedUser)
+            .setToken(UUID.randomUUID().toString()));
         mailService.sendVerificationUrl(savedUser.getEmail(), savedToken.getToken());
     }
 
     public void activate(String token) {
         final UserToken foundToken = Optional.ofNullable(tokenRepository.findByToken(token))
-                .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_NOT_FOUND));
+            .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_NOT_FOUND));
         Optional.of(foundToken).filter(userToken -> LocalDate.now().isBefore(userToken.getExpiryDate()))
-                .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_DATE_EXPIRED));
+            .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_DATE_EXPIRED));
         final User user = foundToken.getUser();
         user.setEnabled(true);
         mailService.sendSuccessfulRegistrationConfirmation(user.getEmail());
@@ -98,10 +96,10 @@ public class UserService implements UserDetailsService {
 
     public void sendResetPasswordUrl(String email) {
         final User user = Optional.ofNullable(userRepository.getByEmail(email))
-                .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+            .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
         final UserToken token = Optional.ofNullable(tokenRepository.findByUser(user.getId()))
-                .orElseGet(() -> tokenRepository.save(new UserToken()
-                        .setUser(user)));
+            .orElseGet(() -> tokenRepository.save(new UserToken()
+                .setUser(user)));
         token.setToken(UUID.randomUUID().toString());
         mailService.sendPasswordResetUrl(email, token.getToken());
     }
@@ -109,7 +107,7 @@ public class UserService implements UserDetailsService {
     public void resetPassword(ResetPasswordRequest request, String email) {
         final String newPassword = request.getPassword();
         final User user = Optional.ofNullable(userRepository.getByEmail(email))
-                .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+            .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
         ValidationUtils.checkMatchingPassword(request.getPassword(), request.getMatchingPassword());
         user.setPassword(newPassword);
     }
@@ -119,13 +117,14 @@ public class UserService implements UserDetailsService {
     }
 
     public void updateInfo(Principal principal, String info) {
-        userRepository.updateInfo(((User) principal).getId(), info);
+        final User user = userRepository.getById(((User) principal).getId());
+        user.setInfo(info);
     }
 
     public Long insertLoginAttempt(Long userId, boolean success) {
         loginAttemptRepository.save(new LoginAttempt()
-                .setUser(userRepository.getById(userId))
-                .setSuccess(success));
+            .setUser(userRepository.getById(userId))
+            .setSuccess(success));
         return loginAttemptRepository.countFailedLoginAttemptsLast30Mins(userId);
     }
 
@@ -140,5 +139,4 @@ public class UserService implements UserDetailsService {
             throw new InternalException(InternalErrorType.USER_ALREADY_EXISTS);
         }
     }
-
 }

@@ -59,23 +59,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                .antMatchers("/swagger-ui/**", "/api-docs/**").hasAuthority(Role.ADMIN.getAuthority())
-                .antMatchers("/login", "/sign_up").permitAll()
-                .antMatchers("/user/**").permitAll()//.authenticated()
-                .antMatchers("/user/**").permitAll()//.hasAuthority(Role.USER.getAuthority())
-                .anyRequest().authenticated()
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().csrf().disable()
-                .formLogin()
-                .loginPage("/login")
-                .loginProcessingUrl("/user/login")
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .failureUrl("/login?error=true")
-                .and().exceptionHandling()
-                .and().logout().permitAll()
-                .logoutSuccessUrl("/");
+            .authorizeRequests()
+            .antMatchers("/swagger-ui/**", "/api-docs/**").hasAuthority(Role.ADMIN.getAuthority())
+            .antMatchers("/login", "/sign_up").permitAll()
+            .antMatchers("/user/**").permitAll()//.authenticated()
+            .antMatchers("/user/**").permitAll()//.hasAuthority(Role.USER.getAuthority())
+            .anyRequest().authenticated()
+            .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and().csrf().disable()
+            .formLogin()
+            .loginPage("/login")
+            .loginProcessingUrl("/user/login")
+            .usernameParameter("email")
+            .passwordParameter("password")
+            .failureUrl("/login?error=true")
+            .and().exceptionHandling()
+            .and().logout().permitAll()
+            .logoutSuccessUrl("/");
     }
-
 }

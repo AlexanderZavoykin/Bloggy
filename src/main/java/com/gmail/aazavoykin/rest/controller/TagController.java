@@ -21,5 +21,4 @@ public class TagController {
     public Response<List<TagDto>> getAll() {
         return Response.success(tagService.getAll());
     }
-
 }

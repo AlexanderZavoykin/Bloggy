@@ -25,5 +25,4 @@ public interface StoryMapper {
     default List<String> tags(List<Tag> tags) {
         return tags.stream().map(Tag::getName).collect(Collectors.toList());
     }
-
 }

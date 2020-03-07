@@ -13,13 +13,11 @@ public enum InternalErrorType {
     COMMENT_NOT_FOUND("E004", "Comment not found"),
     TOKEN_NOT_FOUND("E005", "Verification token not found"),
     USER_ALREADY_EXISTS("E006", "User already exists"),
-    TAG_ALREADY_EXISTS("E007","Tag already exists"),
+    TAG_ALREADY_EXISTS("E007", "Tag already exists"),
     OPERATION_NOT_AVAILABLE("E008", "Operation is not available for this user"),
     TOKEN_DATE_EXPIRED("E009", "Verification token has been expired"),
     PASSWORDS_NOT_MATCH("E010", "Entered passwords differ each from another");
 
     private final String code;
-
     private final String message;
-
 }

@@ -12,7 +12,6 @@ public class TagDto {
     @NotBlank(message = "Tag name can not be blank")
     @Length(min = 6, max = 30, message = "Tag name should have 6 .. 30 characters")
     @Pattern(message = "Tag name can contain only lowercase letters",
-            regexp = "^[a-z]$")
+        regexp = "^[a-z]$")
     private String name;
-
 }

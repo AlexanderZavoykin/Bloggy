@@ -4,14 +4,19 @@ import com.gmail.aazavoykin.rest.dto.CommentDto;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.dto.UserDto;
 import com.gmail.aazavoykin.rest.request.ResetPasswordRequest;
-import com.gmail.aazavoykin.rest.request.UserLoginRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.CommentService;
 import com.gmail.aazavoykin.service.StoryService;
 import com.gmail.aazavoykin.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -23,9 +28,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-
     private final StoryService storyService;
-
     private final CommentService commentService;
 
     @GetMapping(value = "users")
@@ -82,5 +85,4 @@ public class UserController {
         userService.updateInfo(principal, info);
         return Response.success();
     }
-
 }

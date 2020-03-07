@@ -10,10 +10,9 @@ import org.springframework.stereotype.Repository;
 public interface LoginAttemptRepository extends CrudRepository<LoginAttempt, Long> {
 
     @Query(value = "select count(a) from login_attempt a " +
-            "where a.attempted > now() - interval '30 mins' " +
-            "and a.success = false " +
-            "and a.user_id = :userId",
-            nativeQuery = true)
+        "where a.attempted > now() - interval '30 mins' " +
+        "and a.success = false " +
+        "and a.user_id = :userId",
+        nativeQuery = true)
     Long countFailedLoginAttemptsLast30Mins(@Param("userId") Long userId);
-
 }

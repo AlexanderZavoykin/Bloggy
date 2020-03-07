@@ -4,7 +4,11 @@ import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.StoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -50,5 +54,4 @@ public class StoryController {
         storyService.delete(id);
         return Response.success();
     }
-
 }

@@ -23,5 +23,4 @@ public class EmailConfig {
         sender.setPassword(emailProperties.getPassword());
         return sender;
     }
-
 }

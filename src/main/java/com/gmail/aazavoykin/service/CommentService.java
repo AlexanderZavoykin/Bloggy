@@ -13,11 +13,10 @@ import java.util.List;
 public class CommentService {
 
     private final CommentMapper commentMapper;
-
     private final CommentRepository commentRepository;
 
     public List<CommentDto> getAllByAuthorNickname(String nickname) {
         return commentMapper.commentsToCommentDtos(commentRepository.getAllByUserNickname(nickname));
     }
-
 }
+

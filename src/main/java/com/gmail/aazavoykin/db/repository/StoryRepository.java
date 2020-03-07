@@ -26,5 +26,4 @@ public interface StoryRepository extends CrudRepository<Story, Long> {
 
     @Query("select s.id from Story s join User u where u.id = :id")
     List<Long> getStoryIdsByUserId(@Param("id") Long id);
-
 }

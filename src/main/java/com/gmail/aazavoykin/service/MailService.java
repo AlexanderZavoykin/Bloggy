@@ -8,17 +8,13 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import javax.mail.internet.MimeMessage;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class MailService {
 
     private final JavaMailSender mailSender;
-
     private final EmailProperties emailProperties;
-
     private final AppProperties appProperties;
 
     public void sendVerificationUrl(String email, String token) {
@@ -27,7 +23,7 @@ public class MailService {
         message.setTo(email);
         message.setSubject(activationProperties.getSubject());
         message.setText(String.format(activationProperties.getBody(),
-                appProperties.getHostname() + "/user/activate/" + token));
+            appProperties.getHostname() + "/user/activate/" + token));
         mailSender.send(message);
     }
 
@@ -46,8 +42,7 @@ public class MailService {
         message.setTo(email);
         message.setSubject(resetProperties.getSubject());
         message.setText(String.format(resetProperties.getBody(),
-                appProperties.getHostname() + "/user/reset/" + token + "?email=" + email));
+            appProperties.getHostname() + "/user/reset/" + token + "?email=" + email));
         mailSender.send(message);
     }
-
 }
