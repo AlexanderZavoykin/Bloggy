@@ -56,7 +56,7 @@ public class StoryService {
     }
 
     public StoryDto save(StoryDto dto) {
-        final User user = checkAuthorized();
+        final User user = getAuthorized();
         final Story story = new Story();
         story.setUser(user);
         story.setTitle(dto.getTitle());
@@ -68,7 +68,7 @@ public class StoryService {
     }
 
     public StoryDto update(StoryDto dto) {
-        final User user = checkAuthorized();
+        final User user = getAuthorized();
         checkAvailibleForUser(user, dto.getId());
         final Story found = Optional.ofNullable(storyRepository.getById(dto.getId()))
             .orElseThrow(() -> new InternalException(InternalErrorType.STORY_NOT_FOUND));
@@ -80,13 +80,13 @@ public class StoryService {
     }
 
     public void delete(Long id) {
-        final User user = checkAuthorized();
+        final User user = getAuthorized();
         checkAvailibleForUser(user, id);
         log.debug("Deleting story {}", id);
         storyRepository.deleteById(id);
     }
 
-    private User checkAuthorized() {
+    public User getAuthorized() {
         final UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return Optional.ofNullable(userRepository.getByEmail(principal.getUsername())).orElseThrow(() -> {
             log.error("Tried to operate story by unauthorized user");

@@ -1,15 +1,19 @@
 package com.gmail.aazavoykin.rest.controller;
 
+import com.gmail.aazavoykin.configuration.properties.AppProperties;
 import com.gmail.aazavoykin.rest.dto.CommentDto;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.dto.UserDto;
 import com.gmail.aazavoykin.rest.request.ResetPasswordRequest;
+import com.gmail.aazavoykin.rest.request.UserLoginRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.CommentService;
 import com.gmail.aazavoykin.service.StoryService;
 import com.gmail.aazavoykin.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
@@ -27,6 +32,7 @@ import java.util.List;
 @RequestMapping("user")
 public class UserController {
 
+    private final AppProperties appProperties;
     private final UserService userService;
     private final StoryService storyService;
     private final CommentService commentService;
@@ -62,6 +68,13 @@ public class UserController {
         return Response.success();
     }
 
+    @PostMapping("login")
+    public Response<Void> login(@Valid @RequestBody UserLoginRequest request, HttpServletResponse response) {
+        final String token = userService.getAuthenticationToken(request);
+        response.setHeader(appProperties.getToken().getHeader(), appProperties.getToken().getPrefix().concat(token));
+        return Response.success();
+    }
+
     @PostMapping("activate/{token}")
     public Response<Void> activate(@PathVariable String token) {
         userService.activate(token);
@@ -80,6 +93,7 @@ public class UserController {
         return Response.success();
     }
 
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @PostMapping("update")
     public Response<Void> updateInfo(Principal principal, @RequestBody String info) {
         userService.updateInfo(principal, info);

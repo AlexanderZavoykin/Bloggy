@@ -4,6 +4,7 @@ import com.gmail.aazavoykin.db.model.enums.Role;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -58,11 +59,12 @@ public class User implements UserDetails {
     private String password;
     @Column(columnDefinition = "VARCHAR(20)", nullable = false)
     private String nickname;
-    @Column(columnDefinition = "TIMESTAMP DEFAULT NOW()", nullable = false)
+    @CreationTimestamp
+    @Column(nullable = false)
     private LocalDateTime registered;
     @Column(columnDefinition = "VARCHAR(255)")
     private String info;
-    @Column(columnDefinition = "BOOLEAN DEFAULT TRUE")
+    @Column(columnDefinition = "BOOLEAN", nullable = false)
     private boolean enabled;
 
     @Override

@@ -15,6 +15,14 @@ spring:
 
 app:
   hostname: e
+  token:
+    header: X-BLOGGY-TOKEN
+    prefix: bltoken=
+    secret: abcdefg
+    expiration: 1800000
+  login:
+    tries: 3
+    breaktime:
 
 email:
   smtp:

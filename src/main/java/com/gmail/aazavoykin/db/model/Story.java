@@ -2,6 +2,7 @@ package com.gmail.aazavoykin.db.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -40,7 +41,8 @@ public class Story {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "story_id")
     private List<Comment> comments = new ArrayList<>();
-    @Column(columnDefinition = "TIMESTAMP DEFAULT NOW()", nullable = false)
+    @CreationTimestamp
+    @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime created;
     @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String title;

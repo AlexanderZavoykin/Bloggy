@@ -10,7 +10,7 @@ import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolv
 public class GlobalExceptionHandler extends DefaultHandlerExceptionResolver {
 
     @ExceptionHandler
-    public Response<Void> handle(InternalException e) {
+    public Response<Void> handle(Exception e) {
         return Response.error(e);
     }
 }

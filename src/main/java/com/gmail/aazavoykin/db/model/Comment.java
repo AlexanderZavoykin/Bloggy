@@ -2,6 +2,8 @@ package com.gmail.aazavoykin.db.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +16,7 @@ import javax.persistence.SequenceGenerator;
 import java.time.LocalDateTime;
 
 @Data
+@Accessors(chain = true)
 @NoArgsConstructor
 @Entity
 @SequenceGenerator(name = "comment_seq", initialValue = 1000000, allocationSize = 1)
@@ -26,7 +29,8 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-    @Column(columnDefinition = "TIMESTAMP DEFAULT NOW()", nullable = false)
+    @CreationTimestamp
+    @Column(nullable = false)
     private LocalDateTime created;
     @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String body;

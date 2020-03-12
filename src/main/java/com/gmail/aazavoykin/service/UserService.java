@@ -16,13 +16,13 @@ import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,20 +32,15 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService {
 
+    private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
     private final MailService mailService;
     private final UserRepository userRepository;
     private final UserTokenRepository tokenRepository;
     private final LoginAttemptRepository loginAttemptRepository;
     private final PasswordEncoder encoder;
-
-    @Override
-    public UserDetails loadUserByUsername(String email) {
-        return Optional.ofNullable(userRepository.getByEmail(email)).orElseThrow(() ->
-            new InternalException(InternalErrorType.USER_NOT_FOUND));
-    }
 
     public List<UserDto> getAll() {
         return userMapper.usersToUserDtos(userRepository.getAllByOrderByNickname());
@@ -61,6 +56,7 @@ public class UserService implements UserDetailsService {
         return userMapper.userToUserDto(user);
     }
 
+    @Transactional
     public void add(UserSignupRequest request) {
         final String email = request.getEmail();
         final String nickname = request.getNickname();
@@ -81,19 +77,26 @@ public class UserService implements UserDetailsService {
         final UserToken savedToken = tokenRepository.save(new UserToken()
             .setUser(savedUser)
             .setToken(UUID.randomUUID().toString()));
-        mailService.sendVerificationUrl(savedUser.getEmail(), savedToken.getToken());
+        //mailService.sendVerificationUrl(savedUser.getEmail(), savedToken.getToken());
     }
 
+    @Transactional
     public void activate(String token) {
         final UserToken foundToken = Optional.ofNullable(tokenRepository.findByToken(token))
             .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_NOT_FOUND));
-        Optional.of(foundToken).filter(userToken -> LocalDate.now().isBefore(userToken.getExpiryDate()))
+        Optional.of(foundToken).filter(userToken -> LocalDateTime.now().isBefore(userToken.getExpiryDate()))
             .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_DATE_EXPIRED));
         final User user = foundToken.getUser();
-        user.setEnabled(true);
-        mailService.sendSuccessfulRegistrationConfirmation(user.getEmail());
+        if (!user.isEnabled()) {
+            user.setEnabled(true);
+        } else {
+            throw new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE);
+        }
+
+        //mailService.sendSuccessfulRegistrationConfirmation(user.getEmail());
     }
 
+    @Transactional
     public void sendResetPasswordUrl(String email) {
         final User user = Optional.ofNullable(userRepository.getByEmail(email))
             .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
@@ -101,9 +104,10 @@ public class UserService implements UserDetailsService {
             .orElseGet(() -> tokenRepository.save(new UserToken()
                 .setUser(user)));
         token.setToken(UUID.randomUUID().toString());
-        mailService.sendPasswordResetUrl(email, token.getToken());
+        //mailService.sendPasswordResetUrl(email, token.getToken());
     }
 
+    @Transactional
     public void resetPassword(ResetPasswordRequest request, String email) {
         final String newPassword = request.getPassword();
         final User user = Optional.ofNullable(userRepository.getByEmail(email))
@@ -116,6 +120,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(user.setEnabled(enabled));
     }
 
+    @Transactional
     public void updateInfo(Principal principal, String info) {
         final User user = userRepository.getById(((User) principal).getId());
         user.setInfo(info);

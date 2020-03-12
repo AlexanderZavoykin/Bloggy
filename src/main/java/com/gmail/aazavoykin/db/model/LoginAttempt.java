@@ -3,6 +3,7 @@ package com.gmail.aazavoykin.db.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,9 +29,11 @@ public class LoginAttempt {
     @Column(name = "login_attempt_id")
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    @Column(columnDefinition = "TIMESTAMP DEFAULT NOW()", nullable = false)
+    @CreationTimestamp
+    @Column(nullable = false)
     private LocalDateTime attempted;
+    @Column(nullable = false)
     private boolean success;
 }

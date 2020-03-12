@@ -13,7 +13,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Data
 @Accessors(chain = true)
@@ -29,8 +30,8 @@ public class UserToken {
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    @Column(columnDefinition = "VARCHAR(16)", nullable = false)
+    @Column(columnDefinition = "VARCHAR(36)", nullable = false)
     private String token;
-    @Column(name = "expiry_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_DATE + INTERVAL '3 DAYS'", nullable = false)
-    private LocalDate expiryDate;
+    @Column(name = "expiry_date", nullable = false)
+    private LocalDateTime expiryDate = LocalDateTime.now().plus(3L, ChronoUnit.DAYS);
 }

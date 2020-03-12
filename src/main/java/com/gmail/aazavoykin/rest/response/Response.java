@@ -11,12 +11,12 @@ public class Response<T> {
 
     private T body;
     private String message;
-    private HttpStatus httpStatus;
+    private int code;
 
     private Response(T body, String message, HttpStatus httpStatus) {
         this.body = body;
         this.message = message;
-        this.httpStatus = httpStatus;
+        code = httpStatus.value();
     }
 
     public static <T> Response<T> success() {
@@ -27,7 +27,7 @@ public class Response<T> {
         return new Response<>(body, "OK", HttpStatus.OK);
     }
 
-    public static <T> Response<T> error(InternalException e) {
-        return new Response<>(null, e.getErrorType().getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public static <T> Response<T> error(Exception e) {
+        return new Response<>(null, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

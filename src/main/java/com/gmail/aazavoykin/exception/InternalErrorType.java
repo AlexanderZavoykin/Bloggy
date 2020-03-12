@@ -16,7 +16,8 @@ public enum InternalErrorType {
     TAG_ALREADY_EXISTS("E007", "Tag already exists"),
     OPERATION_NOT_AVAILABLE("E008", "Operation is not available for this user"),
     TOKEN_DATE_EXPIRED("E009", "Verification token has been expired"),
-    PASSWORDS_NOT_MATCH("E010", "Entered passwords differ each from another");
+    PASSWORDS_NOT_MATCH("E010", "Entered passwords differ each from another"),
+    TOKEN_NOT_VALIDATED("E011", "Could not validate token");
 
     private final String code;
     private final String message;

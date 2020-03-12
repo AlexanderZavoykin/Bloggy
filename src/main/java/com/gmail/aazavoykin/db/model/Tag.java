@@ -2,6 +2,7 @@ package com.gmail.aazavoykin.db.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,7 +30,8 @@ public class Tag {
     private Long id;
     @ManyToMany(mappedBy = "tags")
     private List<Story> stories = new ArrayList<>();
-    @Column(columnDefinition = "TIMESTAMP DEFAULT NOW()", nullable = false)
+    @CreationTimestamp
+    @Column(nullable = false)
     private LocalDateTime created;
     @Column(nullable = false, columnDefinition = "VARCHAR(30)")
     private String name;
