@@ -1,44 +1,37 @@
 package com.gmail.aazavoykin.security;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 
 import java.util.Collection;
+import java.util.Optional;
 
-public class AppUser implements UserDetails {
+public class AppUser extends User {
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+    private final Long id;
+
+    public AppUser(Long id, String username, String password, boolean enabled,
+                   Collection<? extends GrantedAuthority> authorities) {
+
+        super(username, password, enabled, true, true, true, authorities);
+        this.id = id;
     }
 
-    @Override
-    public String getPassword() {
-        return null;
+    public Long getId() {
+        return id;
     }
 
-    @Override
-    public String getUsername() {
-        return null;
+    public static Optional<AppUser> getCurrentUser() {
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+            .filter(Authentication::isAuthenticated)
+            .filter(a -> a.getPrincipal() instanceof AppUser)
+            .map(a -> (AppUser) a.getPrincipal());
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
+    public <R extends Enum> boolean hasRole(final R e) {
+        return getAuthorities().contains(new SimpleGrantedAuthority(e.name()));
     }
 }

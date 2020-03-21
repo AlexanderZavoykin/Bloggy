@@ -1,5 +1,6 @@
 package com.gmail.aazavoykin.security;
 
+import com.gmail.aazavoykin.db.model.User;
 import com.gmail.aazavoykin.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +16,7 @@ public class AppUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.getByEmail(username);
+        final User user = userRepository.getByEmail(username);
+        return new AppUser(user.getId(), user.getEmail(), user.getPassword(), user.isEnabled(), user.getRoles());
     }
 }

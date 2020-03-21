@@ -9,23 +9,26 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @ConfigurationProperties("app")
 public class AppProperties {
 
-    private final TokenProperties token;
-    private final LoginProperties login;
+    private final AuthProperties auth;
     private final String hostname;
 
     @Data
-    public static class TokenProperties {
+    public static class AuthProperties {
 
-        private final String header;
-        private final String prefix;
-        private final String secret;
-        private final long expiration;
+        private final SigninProperties signin;
+        private final SignupProperties signup;
     }
 
     @Data
-    public static class LoginProperties {
+    public static class SigninProperties {
 
         private final int tries;
         private final long breaktime;
+    }
+
+    @Data
+    public static class SignupProperties {
+
+        private final int lifetime;
     }
 }

@@ -12,8 +12,6 @@ import com.gmail.aazavoykin.rest.dto.CommentDto;
 import com.gmail.aazavoykin.rest.dto.mapper.CommentMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,8 +39,8 @@ public class CommentService {
         final Story story = Optional.ofNullable(storyRepository.getById(storyId))
             .orElseThrow(() -> new InternalException(InternalErrorType.STORY_NOT_FOUND));
         story.getComments().add(new Comment()
-        .setBody(commentBody)
-        .setUser(user));
+            .setBody(commentBody)
+            .setUser(user));
     }
 
 }

@@ -33,6 +33,7 @@ public class EmailProperties {
         private final MessageProperties activation;
         private final MessageProperties confirmation;
         private final MessageProperties reset;
+        private final MessageProperties success;
     }
 
     @Data

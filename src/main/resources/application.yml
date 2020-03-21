@@ -13,16 +13,24 @@ spring:
     hibernate:
       format_sql: true
 
+server:
+  port: 8090
+  servlet:
+    session:
+      cookie:
+        name: bloggytoken
+        secure: false
+        http-only: false
+        max-age: 9999999
+
 app:
   hostname: e
-  token:
-    header: X-BLOGGY-TOKEN
-    prefix: bltoken=
-    secret: abcdefg
-    expiration: 1800000
-  login:
-    tries: 3
-    breaktime:
+  auth:
+    signin:
+      tries: 3
+      breaktime: 1
+    signup:
+      lifetime: 3
 
 email:
   smtp:
@@ -39,6 +47,9 @@ email:
         subject:
         body:
       reset:
+        subject:
+        body:
+      success:
         subject:
         body:
 

@@ -1,5 +1,6 @@
 package com.gmail.aazavoykin.service;
 
+import com.gmail.aazavoykin.configuration.properties.AppProperties;
 import com.gmail.aazavoykin.db.model.LoginAttempt;
 import com.gmail.aazavoykin.db.model.User;
 import com.gmail.aazavoykin.db.model.UserToken;
@@ -16,13 +17,13 @@ import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +35,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final AuthenticationManager authenticationManager;
+    private final AppProperties appProperties;
     private final UserMapper userMapper;
     private final MailService mailService;
     private final UserRepository userRepository;
@@ -76,8 +77,9 @@ public class UserService {
         final User savedUser = userRepository.save(user);
         final UserToken savedToken = tokenRepository.save(new UserToken()
             .setUser(savedUser)
-            .setToken(UUID.randomUUID().toString()));
-        //mailService.sendVerificationUrl(savedUser.getEmail(), savedToken.getToken());
+            .setToken(UUID.randomUUID().toString()))
+            .setExpiryDate(LocalDateTime.now().plus(appProperties.getAuth().getSignup().getLifetime(), ChronoUnit.DAYS));
+        // TODO mailService.sendVerificationUrl(savedUser.getEmail(), savedToken.getToken());
     }
 
     @Transactional
@@ -92,8 +94,7 @@ public class UserService {
         } else {
             throw new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE);
         }
-
-        //mailService.sendSuccessfulRegistrationConfirmation(user.getEmail());
+        // TODO mailService.sendSuccessfulRegistrationConfirmation(user.getEmail());
     }
 
     @Transactional
@@ -104,7 +105,7 @@ public class UserService {
             .orElseGet(() -> tokenRepository.save(new UserToken()
                 .setUser(user)));
         token.setToken(UUID.randomUUID().toString());
-        //mailService.sendPasswordResetUrl(email, token.getToken());
+        // TODO mailService.sendPasswordResetUrl(email, token.getToken());
     }
 
     @Transactional
@@ -114,10 +115,12 @@ public class UserService {
             .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
         ValidationUtils.checkMatchingPassword(request.getPassword(), request.getMatchingPassword());
         user.setPassword(newPassword);
+        // TODO mailService.sendPasswordResetSuccessMessage(email, token.getToken());
     }
 
-    public void setEnabled(User user, boolean enabled) {
-        userRepository.save(user.setEnabled(enabled));
+    @Transactional
+    public void setEnabled(Long id, boolean enabled) {
+        userRepository.getById(id).setEnabled(enabled);
     }
 
     @Transactional

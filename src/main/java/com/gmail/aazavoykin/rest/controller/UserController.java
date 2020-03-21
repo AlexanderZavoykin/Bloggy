@@ -5,7 +5,6 @@ import com.gmail.aazavoykin.rest.dto.CommentDto;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.dto.UserDto;
 import com.gmail.aazavoykin.rest.request.ResetPasswordRequest;
-import com.gmail.aazavoykin.rest.request.UserLoginRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.CommentService;
@@ -13,7 +12,6 @@ import com.gmail.aazavoykin.service.StoryService;
 import com.gmail.aazavoykin.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
@@ -62,20 +59,13 @@ public class UserController {
         return Response.success(commentService.getAllByAuthorNickname(nickname));
     }
 
-    @PostMapping("signup")
+    @PostMapping("auth/signup")
     public Response<Void> signup(@Valid @RequestBody UserSignupRequest request) {
         userService.add(request);
         return Response.success();
     }
 
-    @PostMapping("login")
-    public Response<Void> login(@Valid @RequestBody UserLoginRequest request, HttpServletResponse response) {
-        final String token = userService.getAuthenticationToken(request);
-        response.setHeader(appProperties.getToken().getHeader(), appProperties.getToken().getPrefix().concat(token));
-        return Response.success();
-    }
-
-    @PostMapping("activate/{token}")
+    @PostMapping("auth/activate/{token}")
     public Response<Void> activate(@PathVariable String token) {
         userService.activate(token);
         return Response.success();

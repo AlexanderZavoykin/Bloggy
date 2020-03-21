@@ -2,9 +2,14 @@ package com.gmail.aazavoykin.configuration;
 
 import com.gmail.aazavoykin.configuration.properties.AppProperties;
 import com.gmail.aazavoykin.db.model.User;
+import com.gmail.aazavoykin.security.AppUser;
 import com.gmail.aazavoykin.security.AppUserDetailsService;
+import com.gmail.aazavoykin.security.BloggyAuthenticationEntryPoint;
+import com.gmail.aazavoykin.security.BloggyAuthenticationFailureHandler;
+import com.gmail.aazavoykin.security.BloggyAuthenticationSuccessHandler;
 import com.gmail.aazavoykin.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,9 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserService userService;
     private final AppUserDetailsService userDetailsService;
     private final AppProperties appProperties;
-    private final BloggyAuthenticationFailureHandler commonAuthenticationFailureHandler;
-    private final BloggyAuthenticationSuccessHandler commonAuthenticationSuccessHandler;
-    private final BloggyAuthenticationEntryPoint commonAuthenticationEntryPoint;
+    private final BloggyAuthenticationFailureHandler authenticationFailureHandler;
+    private final BloggyAuthenticationSuccessHandler authenticationSuccessHandler;
+    private final BloggyAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -45,10 +50,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public ApplicationListener<AuthenticationFailureBadCredentialsEvent> failureAuthenticationListener() {
         return e -> {
             final String email = e.getAuthentication().getName();
-            Optional.ofNullable(userService.getByEmail(email)).ifPresent(user -> {
+            Optional.ofNullable((AppUser) userDetailsService.loadUserByUsername(email)).ifPresent(user -> {
                 final Long last30MinAttemptsNum = userService.insertLoginAttempt(user.getId(), false);
-                if (last30MinAttemptsNum > appProperties.getLogin().getTries()) {
-                    userService.setEnabled(user, false);
+                if (last30MinAttemptsNum > appProperties.getAuth().getSignin().getTries()) {
+                    userService.setEnabled(user.getId(), false);
                     // TODO add task to set enabled back to true after 30 minutes
                 }
             });
@@ -77,21 +82,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             .csrf().disable()
-            .formLogin().loginProcessingUrl("/login").usernameParameter("login").passwordParameter("password")
-            .successHandler(commonAuthenticationSuccessHandler)
-            .failureHandler(commonAuthenticationFailureHandler)
+            .formLogin().loginProcessingUrl("user/login").usernameParameter("login").passwordParameter("password")
+            .successHandler(authenticationSuccessHandler)
+            .failureHandler(authenticationFailureHandler)
             .and()
             .logout()
             .logoutUrl("/logout")
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
             .and()
             .exceptionHandling()
-            .authenticationEntryPoint(commonAuthenticationEntryPoint)
+            .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .authorizeRequests()
             .antMatchers("/user/password/**").permitAll()
-            .anyRequest().authenticated()
-            .requestMatchers(EndpointRequest.to("health", "metrics")).permitAll();
+            .anyRequest().authenticated();
     }
 }
 

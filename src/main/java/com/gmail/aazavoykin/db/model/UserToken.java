@@ -33,5 +33,5 @@ public class UserToken {
     @Column(columnDefinition = "VARCHAR(36)", nullable = false)
     private String token;
     @Column(name = "expiry_date", nullable = false)
-    private LocalDateTime expiryDate = LocalDateTime.now().plus(3L, ChronoUnit.DAYS);
+    private LocalDateTime expiryDate;
 }

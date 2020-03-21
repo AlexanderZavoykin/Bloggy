@@ -37,7 +37,7 @@ import java.util.Set;
     uniqueConstraints = {@UniqueConstraint(name = "nickname_ui", columnNames = {"nickname"}),
         @UniqueConstraint(name = "email_ui", columnNames = {"email"})})
 @SequenceGenerator(name = "user_seq", initialValue = 1000000, allocationSize = 1)
-public class User implements UserDetails {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
@@ -66,29 +66,4 @@ public class User implements UserDetails {
     private String info;
     @Column(columnDefinition = "BOOLEAN", nullable = false)
     private boolean enabled;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return enabled;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
 }
