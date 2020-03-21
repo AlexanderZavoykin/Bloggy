@@ -1,6 +1,7 @@
 package com.gmail.aazavoykin.rest.controller;
 
 import com.gmail.aazavoykin.rest.dto.StoryDto;
+import com.gmail.aazavoykin.rest.request.StorySaveRequest;
 import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.CommentService;
 import com.gmail.aazavoykin.service.StoryService;
@@ -50,10 +51,10 @@ public class StoryController {
         return Response.success();
     }
 
-    @PreAuthorize("hasAuthority('USER')")
+    //@PreAuthorize("hasAuthority('USER')")
     @PostMapping("add")
-    public Response<StoryDto> add(StoryDto dto) {
-        return Response.success(storyService.save(dto));
+    public Response<StoryDto> add(@RequestBody StorySaveRequest request) {
+        return Response.success(storyService.save(request));
     }
 
     @PreAuthorize("hasAuthority('USER')")

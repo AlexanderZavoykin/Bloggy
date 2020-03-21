@@ -34,17 +34,13 @@ import java.util.Optional;
 @EnableGlobalMethodSecurity(prePostEnabled = true, proxyTargetClass = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final AppUserDetailsService userDetailsService;
     private final AppProperties appProperties;
     private final BloggyAuthenticationFailureHandler authenticationFailureHandler;
     private final BloggyAuthenticationSuccessHandler authenticationSuccessHandler;
     private final BloggyAuthenticationEntryPoint authenticationEntryPoint;
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public ApplicationListener<AuthenticationFailureBadCredentialsEvent> failureAuthenticationListener() {
@@ -75,14 +71,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .csrf().disable()
-            .formLogin().loginProcessingUrl("user/login").usernameParameter("login").passwordParameter("password")
+            .formLogin().loginProcessingUrl("/login").usernameParameter("login").passwordParameter("password")
             .successHandler(authenticationSuccessHandler)
             .failureHandler(authenticationFailureHandler)
             .and()
@@ -94,7 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .authorizeRequests()
-            .antMatchers("/user/password/**").permitAll()
+            .antMatchers("/user/password/**", "/story/stories", "/user/login").permitAll()
             .anyRequest().authenticated();
     }
 }

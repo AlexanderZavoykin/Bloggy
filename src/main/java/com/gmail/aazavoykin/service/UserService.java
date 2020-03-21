@@ -17,6 +17,8 @@ import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,7 +96,7 @@ public class UserService {
         } else {
             throw new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE);
         }
-        // TODO mailService.sendSuccessfulRegistrationConfirmation(user.getEmail());
+        mailService.sendSuccessfulRegistrationConfirmation(user.getEmail());
     }
 
     @Transactional
@@ -105,7 +107,7 @@ public class UserService {
             .orElseGet(() -> tokenRepository.save(new UserToken()
                 .setUser(user)));
         token.setToken(UUID.randomUUID().toString());
-        // TODO mailService.sendPasswordResetUrl(email, token.getToken());
+        mailService.sendPasswordResetUrl(email, token.getToken());
     }
 
     @Transactional
@@ -115,7 +117,7 @@ public class UserService {
             .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
         ValidationUtils.checkMatchingPassword(request.getPassword(), request.getMatchingPassword());
         user.setPassword(newPassword);
-        // TODO mailService.sendPasswordResetSuccessMessage(email, token.getToken());
+        mailService.sendPasswordResetSuccessMessage(email);
     }
 
     @Transactional

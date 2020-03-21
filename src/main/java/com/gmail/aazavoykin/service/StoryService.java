@@ -9,12 +9,14 @@ import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.dto.mapper.StoryMapper;
+import com.gmail.aazavoykin.rest.request.StorySaveRequest;
+import com.gmail.aazavoykin.security.AppUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,49 +57,52 @@ public class StoryService {
         return storyMapper.storiesToStoryDtos(storyRepository.getAllByUserNicknameAndRoughTrue(nickname));
     }
 
-    public StoryDto save(StoryDto dto) {
-        final User user = getAuthorized();
-        final Story story = new Story();
-        story.setUser(user);
-        story.setTitle(dto.getTitle());
-        story.setBody(dto.getBody());
-        story.setTags(dto.getTags().stream().map(Tag::new).collect(Collectors.toList()));
-        final Story saved = storyRepository.save(story);
-        log.debug("Saving new story {}", saved);
-        return storyMapper.storyToStoryDto(saved);
+    @Transactional
+    public StoryDto save(StorySaveRequest request) {
+        return AppUser.getCurrentUser().map(appUser -> {
+            final User user = userRepository.findById(appUser.getId())
+                .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+            final Story story = new Story();
+            story.setUser(user);
+            story.setTitle(request.getTitle());
+            story.setBody(request.getBody());
+            story.setTags(request.getTags().stream().map(Tag::new).collect(Collectors.toList()));
+            story.setCreated(LocalDateTime.now());
+            final Story saved = storyRepository.save(story);
+            log.debug("Saved new story {}", saved);
+            return storyMapper.storyToStoryDto(saved);
+        }).orElseThrow(() -> new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE));
     }
 
     public StoryDto update(StoryDto dto) {
-        final User user = getAuthorized();
-        checkAvailibleForUser(user, dto.getId());
-        final Story found = Optional.ofNullable(storyRepository.getById(dto.getId()))
-            .orElseThrow(() -> new InternalException(InternalErrorType.STORY_NOT_FOUND));
-        found.setTitle(dto.getTitle());
-        found.setBody(dto.getBody());
-        found.setTags(dto.getTags().stream().map(Tag::new).collect(Collectors.toList()));
-        log.debug("Updating new story {}", found);
-        return storyMapper.storyToStoryDto(storyRepository.save(found));
+        return AppUser.getCurrentUser().map(appUser -> {
+            final User user = userRepository.findById(appUser.getId())
+                .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+            checkAvailibleForUser(user, dto.getId());
+            final Story found = Optional.ofNullable(storyRepository.getById(dto.getId()))
+                .orElseThrow(() -> new InternalException(InternalErrorType.STORY_NOT_FOUND));
+            found.setTitle(dto.getTitle());
+            found.setBody(dto.getBody());
+            found.setTags(dto.getTags().stream().map(Tag::new).collect(Collectors.toList()));
+            log.debug("Updating new story {}", found);
+            return storyMapper.storyToStoryDto(storyRepository.save(found));
+        }).orElseThrow(() -> new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE));
     }
 
     public void delete(Long id) {
-        final User user = getAuthorized();
+        final AppUser appUser = AppUser.getCurrentUser()
+            .orElseThrow(() -> new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE));
+        final User user = userRepository.findById(appUser.getId())
+            .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
         checkAvailibleForUser(user, id);
         log.debug("Deleting story {}", id);
         storyRepository.deleteById(id);
     }
 
-    public User getAuthorized() {
-        final UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return Optional.ofNullable(userRepository.getByEmail(principal.getUsername())).orElseThrow(() -> {
-            log.error("Tried to operate story by unauthorized user");
-            return new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE);
-        });
-    }
-
     private void checkAvailibleForUser(User user, Long storyId) {
         if (storyRepository.getStoryIdsByUserId(user.getId()).stream().noneMatch(id -> id.equals(storyId))) {
             log.error("Tried to operate story {} by another user {}", storyId, user);
-            throw new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE);
+            throw new InternalException(InternalErrorType.ACCESS_DENIED);
         }
     }
 }

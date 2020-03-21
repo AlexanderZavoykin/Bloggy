@@ -10,6 +10,7 @@ import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.CommentDto;
 import com.gmail.aazavoykin.rest.dto.mapper.CommentMapper;
+import com.gmail.aazavoykin.security.AppUser;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,13 +36,15 @@ public class CommentService {
 
     @Transactional
     public void addComment(Long storyId, String commentBody) {
-        final User user = storyService.getAuthorized();
+        final AppUser appUser = AppUser.getCurrentUser()
+            .orElseThrow(() -> new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE));
+        final User user = userRepository.findById(appUser.getId())
+            .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
         final Story story = Optional.ofNullable(storyRepository.getById(storyId))
             .orElseThrow(() -> new InternalException(InternalErrorType.STORY_NOT_FOUND));
         story.getComments().add(new Comment()
             .setBody(commentBody)
             .setUser(user));
     }
-
 }
 

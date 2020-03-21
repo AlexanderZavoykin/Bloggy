@@ -24,7 +24,7 @@ public class MailService {
         message.setSubject(activationProperties.getSubject());
         message.setText(String.format(activationProperties.getBody(),
             appProperties.getHostname() + "/user/activate/" + token));
-        mailSender.send(message);
+//        mailSender.send(message);
     }
 
     public void sendSuccessfulRegistrationConfirmation(String email) {
@@ -33,7 +33,7 @@ public class MailService {
         message.setTo(email);
         message.setSubject(confirmationProperties.getSubject());
         message.setText(confirmationProperties.getBody());
-        mailSender.send(message);
+//        mailSender.send(message);
     }
 
     public void sendPasswordResetUrl(String email, String token) {
@@ -43,6 +43,9 @@ public class MailService {
         message.setSubject(resetProperties.getSubject());
         message.setText(String.format(resetProperties.getBody(),
             appProperties.getHostname() + "/user/reset/" + token + "?email=" + email));
-        mailSender.send(message);
+//        mailSender.send(message);
+    }
+
+    public void sendPasswordResetSuccessMessage(String email) {
     }
 }

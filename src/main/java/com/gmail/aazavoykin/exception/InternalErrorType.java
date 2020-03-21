@@ -17,7 +17,8 @@ public enum InternalErrorType {
     OPERATION_NOT_AVAILABLE("E008", "Operation is not available for this user"),
     TOKEN_DATE_EXPIRED("E009", "Verification token has been expired"),
     PASSWORDS_NOT_MATCH("E010", "Entered passwords differ each from another"),
-    TOKEN_NOT_VALIDATED("E011", "Could not validate token");
+    TOKEN_NOT_VALIDATED("E011", "Could not validate token"),
+    ACCESS_DENIED("E012", "Access denied for this user");
 
     private final String code;
     private final String message;

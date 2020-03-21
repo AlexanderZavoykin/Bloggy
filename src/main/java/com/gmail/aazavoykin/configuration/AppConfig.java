@@ -6,10 +6,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RequiredArgsConstructor
 @Configuration
-public class EmailConfig {
+public class AppConfig {
 
     private final EmailProperties emailProperties;
 
@@ -22,5 +24,10 @@ public class EmailConfig {
         sender.setUsername(emailProperties.getUsername());
         sender.setPassword(emailProperties.getPassword());
         return sender;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
