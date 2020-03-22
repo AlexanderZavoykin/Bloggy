@@ -1,6 +1,5 @@
 package com.gmail.aazavoykin.rest.response;
 
-import com.gmail.aazavoykin.exception.InternalException;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.http.HttpStatus;
@@ -27,7 +26,7 @@ public class Response<T> {
         return new Response<>(body, "OK", HttpStatus.OK);
     }
 
-    public static <T> Response<T> error() {
+    public static <T> Response<T> unknownError() {
         return new Response<>(null, "Error! Please, contact admin", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

@@ -8,6 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -23,6 +24,8 @@ public interface StoryMapper {
 
     @IterableMapping
     default List<String> tags(List<Tag> tags) {
-        return tags.stream().map(Tag::getName).collect(Collectors.toList());
+        return Optional.ofNullable(tags)
+            .map(t -> t.stream().map(Tag::getName).collect(Collectors.toList()))
+            .orElse(null);
     }
 }

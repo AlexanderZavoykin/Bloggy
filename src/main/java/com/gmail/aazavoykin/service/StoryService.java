@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,8 +65,10 @@ public class StoryService {
             story.setUser(user);
             story.setTitle(request.getTitle());
             story.setBody(request.getBody());
-            story.setTags(request.getTags().stream().map(Tag::new).collect(Collectors.toList()));
-            story.setCreated(LocalDateTime.now());
+            story.setTags(Optional.ofNullable(request.getTags())
+                .map(tags -> tags.stream().map(Tag::new).collect(Collectors.toList()))
+                .orElse(null));
+            log.debug("Saving new story {}", story);
             final Story saved = storyRepository.save(story);
             log.debug("Saved new story {}", saved);
             return storyMapper.storyToStoryDto(saved);

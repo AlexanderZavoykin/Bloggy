@@ -6,7 +6,6 @@ import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.CommentService;
 import com.gmail.aazavoykin.service.StoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,19 +50,16 @@ public class StoryController {
         return Response.success();
     }
 
-    //@PreAuthorize("hasAuthority('USER')")
     @PostMapping("add")
     public Response<StoryDto> add(@RequestBody StorySaveRequest request) {
         return Response.success(storyService.save(request));
     }
 
-    @PreAuthorize("hasAuthority('USER')")
     @PostMapping("update")
     public Response<StoryDto> update(StoryDto dto) {
         return Response.success(storyService.update(dto));
     }
 
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @PostMapping("delete/{id}")
     public Response<Void> delete(@PathVariable("id") Long id) {
         storyService.delete(id);

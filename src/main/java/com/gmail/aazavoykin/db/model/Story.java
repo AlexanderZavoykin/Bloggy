@@ -42,7 +42,7 @@ public class Story {
     @JoinColumn(name = "story_id")
     private List<Comment> comments = new ArrayList<>();
     @CreationTimestamp
-    @Column(columnDefinition = "TIMESTAMP DEFAULT NOW()", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime created;
     @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String title;

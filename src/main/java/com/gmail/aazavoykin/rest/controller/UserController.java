@@ -11,7 +11,6 @@ import com.gmail.aazavoykin.service.CommentService;
 import com.gmail.aazavoykin.service.StoryService;
 import com.gmail.aazavoykin.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -83,7 +82,6 @@ public class UserController {
         return Response.success();
     }
 
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @PostMapping("update")
     public Response<Void> updateInfo(Principal principal, @RequestBody String info) {
         userService.updateInfo(principal, info);

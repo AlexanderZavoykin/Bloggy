@@ -14,7 +14,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Data
 @Accessors(chain = true)

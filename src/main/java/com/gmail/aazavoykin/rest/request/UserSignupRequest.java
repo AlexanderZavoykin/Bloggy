@@ -1,6 +1,5 @@
 package com.gmail.aazavoykin.rest.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
