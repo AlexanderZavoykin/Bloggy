@@ -2,6 +2,7 @@ package com.gmail.aazavoykin.rest.controller;
 
 import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.request.StorySaveRequest;
+import com.gmail.aazavoykin.rest.request.StoryUpdateRequest;
 import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.CommentService;
 import com.gmail.aazavoykin.service.StoryService;
@@ -56,8 +57,8 @@ public class StoryController {
     }
 
     @PostMapping("update")
-    public Response<StoryDto> update(StoryDto dto) {
-        return Response.success(storyService.update(dto));
+    public Response<StoryDto> update(@RequestBody StoryUpdateRequest request) {
+        return Response.success(storyService.update(request));
     }
 
     @PostMapping("delete/{id}")

@@ -23,7 +23,4 @@ public interface StoryRepository extends CrudRepository<Story, Long> {
     List<Story> getAllByUserNicknameAndRoughFalse(String nickname);
 
     List<Story> getAllByUserNicknameAndRoughTrue(String nickname);
-
-    @Query("select s.id from Story s join User u where u.id = :id")
-    List<Long> getStoryIdsByUserId(@Param("id") Long id);
 }

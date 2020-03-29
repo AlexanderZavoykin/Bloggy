@@ -10,6 +10,7 @@ import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.dto.mapper.StoryMapper;
 import com.gmail.aazavoykin.rest.request.StorySaveRequest;
+import com.gmail.aazavoykin.rest.request.StoryUpdateRequest;
 import com.gmail.aazavoykin.security.AppUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +66,7 @@ public class StoryService {
             story.setUser(user);
             story.setTitle(request.getTitle());
             story.setBody(request.getBody());
-            story.setTags(Optional.ofNullable(request.getTags())
+            story.setTags(Optional.ofNullable(request.getTagNames())
                 .map(tags -> tags.stream().map(Tag::new).collect(Collectors.toList()))
                 .orElse(null));
             log.debug("Saving new story {}", story);
@@ -75,18 +76,22 @@ public class StoryService {
         }).orElseThrow(() -> new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE));
     }
 
-    public StoryDto update(StoryDto dto) {
+    @Transactional
+    public StoryDto update(StoryUpdateRequest request) {
         return AppUser.getCurrentUser().map(appUser -> {
             final User user = userRepository.findById(appUser.getId())
                 .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
-            checkAvailibleForUser(user, dto.getId());
-            final Story found = Optional.ofNullable(storyRepository.getById(dto.getId()))
+            checkAvailibleForUser(user, request.getId());
+            final Story found = Optional.ofNullable(storyRepository.getById(request.getId()))
                 .orElseThrow(() -> new InternalException(InternalErrorType.STORY_NOT_FOUND));
-            found.setTitle(dto.getTitle());
-            found.setBody(dto.getBody());
-            found.setTags(dto.getTags().stream().map(Tag::new).collect(Collectors.toList()));
+            found.setTitle(request.getTitle());
+            found.setBody(request.getBody());
+            final List<Tag> requestTags = Optional.ofNullable(request.getTagNames())
+                .map(tagNames -> tagNames.stream().map(Tag::new).collect(Collectors.toList()))
+                .orElse(null);
+            found.setTags(requestTags);
             log.debug("Updating new story {}", found);
-            return storyMapper.storyToStoryDto(storyRepository.save(found));
+            return storyMapper.storyToStoryDto(found);
         }).orElseThrow(() -> new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE));
     }
 
@@ -101,7 +106,7 @@ public class StoryService {
     }
 
     private void checkAvailibleForUser(User user, Long storyId) {
-        if (storyRepository.getStoryIdsByUserId(user.getId()).stream().noneMatch(id -> id.equals(storyId))) {
+        if (!storyRepository.getById(storyId).getUser().equals(user)) {
             log.error("Tried to operate story {} by another user {}", storyId, user);
             throw new InternalException(InternalErrorType.ACCESS_DENIED);
         }
