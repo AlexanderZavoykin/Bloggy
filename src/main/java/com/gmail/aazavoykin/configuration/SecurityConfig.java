@@ -92,7 +92,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .authorizeRequests()
-            .antMatchers("/user/password/**", "/story/stories").permitAll()
+            .antMatchers("/user/password/**", "/story/stories", "/story/last10", "/story/{id}").permitAll()
             .antMatchers("/login").anonymous()
             .anyRequest().authenticated();
     }
