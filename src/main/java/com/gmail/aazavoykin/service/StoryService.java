@@ -4,6 +4,7 @@ import com.gmail.aazavoykin.db.model.Story;
 import com.gmail.aazavoykin.db.model.Tag;
 import com.gmail.aazavoykin.db.model.User;
 import com.gmail.aazavoykin.db.repository.StoryRepository;
+import com.gmail.aazavoykin.db.repository.TagRepository;
 import com.gmail.aazavoykin.db.repository.UserRepository;
 import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
@@ -30,6 +31,7 @@ public class StoryService {
     private final StoryMapper storyMapper;
     private final StoryRepository storyRepository;
     private final UserRepository userRepository;
+    private final TagRepository tagRepository;
 
     public List<StoryDto> getAll() {
         return storyMapper.storiesToStoryDtos(storyRepository.getAllByRoughFalseOrderByCreatedDesc());
@@ -46,7 +48,7 @@ public class StoryService {
     }
 
     public List<StoryDto> getAlByTag(String tagName) {
-        return storyMapper.storiesToStoryDtos(storyRepository.getAllByTagName(tagName));
+        return storyMapper.storiesToStoryDtos(storyRepository.getAllByTags_Name(tagName));
     }
 
     public List<StoryDto> getAllByUserNickname(String nickname) {
@@ -66,14 +68,16 @@ public class StoryService {
             story.setUser(user);
             story.setTitle(request.getTitle());
             story.setBody(request.getBody());
-            story.setTags(Optional.ofNullable(request.getTagNames())
-                .map(tags -> tags.stream().map(Tag::new).collect(Collectors.toList()))
-                .orElse(null));
-            log.debug("Saving new story {}", story);
-            final Story saved = storyRepository.save(story);
+            final List<Tag> requestTags = Optional.ofNullable(request.getTagNames())
+                .map(tagNames -> tagNames.stream()
+                    .map(tagName -> Optional.ofNullable(tagRepository.getByName(tagName)).orElse(new Tag(tagName)))
+                    .collect(Collectors.toList()))
+                .orElse(null);
+            story.setTags(requestTags);
+            final Story saved = storyRepository.saveAndFlush(story);
             log.debug("Saved new story {}", saved);
             return storyMapper.storyToStoryDto(saved);
-        }).orElseThrow(() -> new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE));
+        }).orElse(null);
     }
 
     @Transactional
@@ -81,17 +85,21 @@ public class StoryService {
         return AppUser.getCurrentUser().map(appUser -> {
             final User user = userRepository.findById(appUser.getId())
                 .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
-            checkAvailibleForUser(user, request.getId());
             final Story found = Optional.ofNullable(storyRepository.getById(request.getId()))
                 .orElseThrow(() -> new InternalException(InternalErrorType.STORY_NOT_FOUND));
+            checkAvailibleForUser(user, request.getId());
             found.setTitle(request.getTitle());
             found.setBody(request.getBody());
+            found.setRough(request.isRough());
             final List<Tag> requestTags = Optional.ofNullable(request.getTagNames())
-                .map(tagNames -> tagNames.stream().map(Tag::new).collect(Collectors.toList()))
+                .map(tagNames -> tagNames.stream()
+                    .map(tagName -> Optional.ofNullable(tagRepository.getByName(tagName)).orElse(new Tag(tagName)))
+                    .collect(Collectors.toList()))
                 .orElse(null);
             found.setTags(requestTags);
-            log.debug("Updating new story {}", found);
-            return storyMapper.storyToStoryDto(found);
+            final Story updated = storyRepository.saveAndFlush(found);
+            log.debug("Updated story {}", updated);
+            return storyMapper.storyToStoryDto(updated);
         }).orElseThrow(() -> new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE));
     }
 

@@ -42,7 +42,7 @@ public class MailService {
         message.setTo(email);
         message.setSubject(resetProperties.getSubject());
         message.setText(String.format(resetProperties.getBody(),
-            appProperties.getHostname() + "/user/reset/" + token + "?email=" + email));
+            appProperties.getHostname() + "/user/reset/" + token));
 //        mailSender.send(message);
     }
 

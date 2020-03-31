@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 public class UserToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_token_seq")
     @Column(name = "user_token_id")
     private Long id;
     @OneToOne

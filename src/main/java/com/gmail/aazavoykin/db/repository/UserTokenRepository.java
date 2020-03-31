@@ -9,5 +9,5 @@ public interface UserTokenRepository extends CrudRepository<UserToken, Long> {
 
     UserToken findByToken(String token);
 
-    UserToken findByUser(Long id);
+    UserToken findByUserId(Long id);
 }

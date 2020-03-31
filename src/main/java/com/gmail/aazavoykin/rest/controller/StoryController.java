@@ -1,6 +1,7 @@
 package com.gmail.aazavoykin.rest.controller;
 
 import com.gmail.aazavoykin.rest.dto.StoryDto;
+import com.gmail.aazavoykin.rest.request.CommentStoryRequest;
 import com.gmail.aazavoykin.rest.request.StorySaveRequest;
 import com.gmail.aazavoykin.rest.request.StoryUpdateRequest;
 import com.gmail.aazavoykin.rest.response.Response;
@@ -46,18 +47,17 @@ public class StoryController {
     }
 
     @PostMapping("{id}/comment")
-    public Response<Void> addComment(@PathVariable("id") Long storyId, @Valid @RequestBody String commentBody) {
-        commentService.addComment(storyId, commentBody);
-        return Response.success();
+    public Response<StoryDto> addComment(@PathVariable("id") Long storyId, @Valid @RequestBody CommentStoryRequest request) {
+        return Response.success(commentService.addComment(storyId, request.getBody()));
     }
 
     @PostMapping("add")
-    public Response<StoryDto> add(@RequestBody StorySaveRequest request) {
+    public Response<StoryDto> add(@Valid @RequestBody StorySaveRequest request) {
         return Response.success(storyService.save(request));
     }
 
     @PostMapping("update")
-    public Response<StoryDto> update(@RequestBody StoryUpdateRequest request) {
+    public Response<StoryDto> update(@Valid @RequestBody StoryUpdateRequest request) {
         return Response.success(storyService.update(request));
     }
 

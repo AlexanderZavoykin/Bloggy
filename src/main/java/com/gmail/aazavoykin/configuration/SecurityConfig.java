@@ -68,7 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/api-docs", "/configuration/ui", "/swagger-ui.html");
+        web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-ui.html");
     }
 
     @Override
@@ -92,9 +92,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .authorizeRequests()
-            .antMatchers("/user/password/**", "/story/stories", "/story/last10", "/story/{id}").permitAll()
-            .antMatchers("/login").anonymous()
-            .anyRequest().authenticated();
+            .antMatchers("/login", "/user/auth/**", "/user/password/**").anonymous()
+            .antMatchers("/story/stories", "/story/last10", "/story/{id}", "/story/tag/{tag}", "/tag/tags",
+                "/user/users", "/user/{nickname}/**").permitAll();
     }
 }
 

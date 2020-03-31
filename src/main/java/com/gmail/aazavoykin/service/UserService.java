@@ -12,8 +12,10 @@ import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.UserDto;
 import com.gmail.aazavoykin.rest.dto.mapper.UserMapper;
-import com.gmail.aazavoykin.rest.request.ResetPasswordRequest;
+import com.gmail.aazavoykin.rest.request.ChangePasswordRequest;
+import com.gmail.aazavoykin.rest.request.UpdateUserInfoRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
+import com.gmail.aazavoykin.security.AppUser;
 import com.gmail.aazavoykin.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,7 +46,8 @@ public class UserService {
     private final PasswordEncoder encoder;
 
     public List<UserDto> getAll() {
-        return userMapper.usersToUserDtos(userRepository.getAllByOrderByNickname());
+        return userMapper.usersToUserDtos(userRepository.getAllByOrderByNickname())
+            .stream().map(this::hideEmail).collect(Collectors.toList());
     }
 
     public User getByEmail(String email) {
@@ -54,7 +57,7 @@ public class UserService {
     public UserDto getByNickname(String nickname) {
         final User user = Optional.ofNullable(userRepository.getByNickname(nickname)).orElseThrow(() ->
             new InternalException(InternalErrorType.USER_NOT_FOUND));
-        return userMapper.userToUserDto(user);
+        return hideEmail(userMapper.userToUserDto(user));
     }
 
     @Transactional
@@ -77,9 +80,9 @@ public class UserService {
         final User savedUser = userRepository.save(user);
         final UserToken savedToken = tokenRepository.save(new UserToken()
             .setUser(savedUser)
-            .setToken(UUID.randomUUID().toString()))
-            .setExpiryDate(LocalDateTime.now().plus(appProperties.getAuth().getSignup().getLifetime(), ChronoUnit.DAYS));
-        // TODO mailService.sendVerificationUrl(savedUser.getEmail(), savedToken.getToken());
+            .setToken(UUID.randomUUID().toString())
+            .setExpiryDate(LocalDateTime.now().plus(appProperties.getAuth().getSignup().getLifetime(), ChronoUnit.DAYS)));
+        mailService.sendVerificationUrl(savedUser.getEmail(), savedToken.getToken());
     }
 
     @Transactional
@@ -101,21 +104,24 @@ public class UserService {
     public void sendResetPasswordUrl(String email) {
         final User user = Optional.ofNullable(userRepository.getByEmail(email))
             .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
-        final UserToken token = Optional.ofNullable(tokenRepository.findByUser(user.getId()))
-            .orElseGet(() -> tokenRepository.save(new UserToken()
-                .setUser(user)));
-        token.setToken(UUID.randomUUID().toString());
+        final UserToken token = Optional.ofNullable(tokenRepository.findByUserId(user.getId()))
+            .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_NOT_FOUND))
+            .setExpiryDate(LocalDateTime.now().plus(appProperties.getAuth().getForgot().getLifetime(), ChronoUnit.DAYS))
+            .setToken(UUID.randomUUID().toString());
         mailService.sendPasswordResetUrl(email, token.getToken());
     }
 
     @Transactional
-    public void resetPassword(ResetPasswordRequest request, String email) {
-        final String newPassword = request.getPassword();
-        final User user = Optional.ofNullable(userRepository.getByEmail(email))
-            .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+    public void changePassword(ChangePasswordRequest request, String token) {
+        final UserToken foundToken = Optional.ofNullable(tokenRepository.findByToken(token))
+            .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_NOT_FOUND));
+        Optional.of(foundToken).filter(userToken -> LocalDateTime.now().isBefore(userToken.getExpiryDate()))
+            .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_DATE_EXPIRED));
         ValidationUtils.checkMatchingPassword(request.getPassword(), request.getMatchingPassword());
-        user.setPassword(newPassword);
-        mailService.sendPasswordResetSuccessMessage(email);
+        final User user = foundToken.getUser();
+        final String encodedPassword = encoder.encode(request.getPassword());
+        user.setPassword(encodedPassword);
+        mailService.sendPasswordResetSuccessMessage(user.getEmail());
     }
 
     @Transactional
@@ -124,9 +130,12 @@ public class UserService {
     }
 
     @Transactional
-    public void updateInfo(Principal principal, String info) {
-        final User user = userRepository.getById(((User) principal).getId());
-        user.setInfo(info);
+    public void updateInfo(UpdateUserInfoRequest request) {
+        AppUser.getCurrentUser().ifPresent(appUser -> {
+            final User user = userRepository.findById(appUser.getId())
+                .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+            user.setInfo(request.getInfo());
+        });
     }
 
     public Long insertLoginAttempt(Long userId, boolean success) {
@@ -146,5 +155,13 @@ public class UserService {
         if (userRepository.getByNickname(nickname) != null) {
             throw new InternalException(InternalErrorType.USER_ALREADY_EXISTS);
         }
+    }
+
+    private UserDto hideEmail(UserDto userDto) {
+        final boolean isAdmin = AppUser.getCurrentUser().map(appUser -> appUser.hasRole(Role.ADMIN)).orElse(false);
+        if (!isAdmin) {
+            userDto.setEmail("NOT_AVAILABLE");
+        }
+        return userDto;
     }
 }

@@ -10,4 +10,6 @@ import java.util.List;
 public interface TagRepository extends CrudRepository<Tag, Long> {
 
     List<Tag> getAllByOrderByName();
+
+    Tag getByName(String name);
 }

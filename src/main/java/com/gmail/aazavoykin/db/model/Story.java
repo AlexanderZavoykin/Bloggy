@@ -3,6 +3,7 @@ package com.gmail.aazavoykin.db.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -33,7 +34,7 @@ public class Story {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(name = "story_tag",
         joinColumns = @JoinColumn(name = "story_id"),
         inverseJoinColumns = @JoinColumn(name = "tag_id"))
@@ -44,6 +45,9 @@ public class Story {
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime created;
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updated;
     @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String title;
     @Column(columnDefinition = "TEXT", nullable = false)

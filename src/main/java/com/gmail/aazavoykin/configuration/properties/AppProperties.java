@@ -17,6 +17,7 @@ public class AppProperties {
 
         private final SigninProperties signin;
         private final SignupProperties signup;
+        private final ForgotProperties forgot;
     }
 
     @Data
@@ -28,6 +29,12 @@ public class AppProperties {
 
     @Data
     public static class SignupProperties {
+
+        private final int lifetime;
+    }
+
+    @Data
+    public static class ForgotProperties {
 
         private final int lifetime;
     }

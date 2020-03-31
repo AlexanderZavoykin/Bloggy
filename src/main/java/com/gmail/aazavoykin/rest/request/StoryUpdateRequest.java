@@ -18,4 +18,5 @@ public class StoryUpdateRequest {
     private List<String> tagNames;
     @NotBlank(message = "Body can not be blank")
     private String body;
+    private boolean rough = false;
 }

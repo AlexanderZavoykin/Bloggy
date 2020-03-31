@@ -9,7 +9,9 @@ import com.gmail.aazavoykin.db.repository.UserRepository;
 import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.CommentDto;
+import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.dto.mapper.CommentMapper;
+import com.gmail.aazavoykin.rest.dto.mapper.StoryMapper;
 import com.gmail.aazavoykin.security.AppUser;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class CommentService {
 
     private final CommentMapper commentMapper;
+    private final StoryMapper storyMapper;
     private final CommentRepository commentRepository;
     private final StoryRepository storyRepository;
     private final UserRepository userRepository;
@@ -35,7 +38,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void addComment(Long storyId, String commentBody) {
+    public StoryDto addComment(Long storyId, String commentBody) {
         final AppUser appUser = AppUser.getCurrentUser()
             .orElseThrow(() -> new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE));
         final User user = userRepository.findById(appUser.getId())
@@ -45,6 +48,7 @@ public class CommentService {
         story.getComments().add(new Comment()
             .setBody(commentBody)
             .setUser(user));
+        return storyMapper.storyToStoryDto(storyRepository.saveAndFlush(story));
     }
 }
 

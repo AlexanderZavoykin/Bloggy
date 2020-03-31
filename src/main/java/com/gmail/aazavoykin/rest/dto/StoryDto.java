@@ -12,13 +12,13 @@ import java.util.List;
 public class StoryDto {
 
     private Long id;
-    @NotBlank(message = "Title can not be blank")
-    @Length(min = 6, max = 255, message = "Title should contain from 6 up to 255 symbols")
     private String title;
     private String authorNickname;
     private Long authorId;
     private String created;
-    private List<String> tags;
-    @NotBlank(message = "Body can not be blank")
+    private String updated;
+    private List<TagDto> tags;
+    private List<CommentDto> comments;
     private String body;
+    private boolean rough;
 }

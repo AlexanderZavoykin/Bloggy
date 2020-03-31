@@ -1,10 +1,11 @@
 package com.gmail.aazavoykin.rest.controller;
 
-import com.gmail.aazavoykin.configuration.properties.AppProperties;
 import com.gmail.aazavoykin.rest.dto.CommentDto;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
 import com.gmail.aazavoykin.rest.dto.UserDto;
-import com.gmail.aazavoykin.rest.request.ResetPasswordRequest;
+import com.gmail.aazavoykin.rest.request.ChangePasswordRequest;
+import com.gmail.aazavoykin.rest.request.ForgotPasswordRequest;
+import com.gmail.aazavoykin.rest.request.UpdateUserInfoRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.CommentService;
@@ -16,11 +17,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -28,17 +27,16 @@ import java.util.List;
 @RequestMapping("user")
 public class UserController {
 
-    private final AppProperties appProperties;
     private final UserService userService;
     private final StoryService storyService;
     private final CommentService commentService;
 
-    @GetMapping(value = "users")
+    @GetMapping("users")
     public Response<List<UserDto>> all() {
         return Response.success(userService.getAll());
     }
 
-    @GetMapping(value = "{nickname}")
+    @GetMapping("{nickname}")
     public Response<UserDto> userInfo(@PathVariable("nickname") String nickname) {
         return Response.success(userService.getByNickname(nickname));
     }
@@ -46,11 +44,6 @@ public class UserController {
     @GetMapping("{nickname}/stories")
     public Response<List<StoryDto>> getStoriesByAuthorNickname(@PathVariable("nickname") String nickname) {
         return Response.success(storyService.getAllByUserNickname(nickname));
-    }
-
-    @GetMapping("{nickname}/stories/rough")
-    public Response<List<StoryDto>> getRoughStoriesByAuthorNickname(@PathVariable("nickname") String nickname) {
-        return Response.success(storyService.getRoughByUserNickname(nickname));
     }
 
     @GetMapping("{nickname}/comments")
@@ -71,20 +64,20 @@ public class UserController {
     }
 
     @PostMapping("password/forgot")
-    public Response<Void> forgotPassword(@RequestBody String email) {
-        userService.sendResetPasswordUrl(email);
+    public Response<Void> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        userService.sendResetPasswordUrl(request.getEmail());
         return Response.success();
     }
 
-    @PostMapping("password/reset")
-    public Response<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request, @RequestParam("email") String email) {
-        userService.resetPassword(request, email);
+    @PostMapping("password/change/{token}")
+    public Response<Void> resetPassword(@Valid @RequestBody ChangePasswordRequest request, @PathVariable("token") String token) {
+        userService.changePassword(request, token);
         return Response.success();
     }
 
     @PostMapping("update")
-    public Response<Void> updateInfo(Principal principal, @RequestBody String info) {
-        userService.updateInfo(principal, info);
+    public Response<Void> updateInfo(@RequestBody UpdateUserInfoRequest request) {
+        userService.updateInfo(request);
         return Response.success();
     }
 }
