@@ -100,23 +100,23 @@ public class StoryService {
             final Story updated = storyRepository.saveAndFlush(found);
             log.debug("Updated story {}", updated);
             return storyMapper.storyToStoryDto(updated);
-        }).orElseThrow(() -> new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE));
+        }).orElse(null);
     }
 
     public void delete(Long id) {
-        final AppUser appUser = AppUser.getCurrentUser()
-            .orElseThrow(() -> new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE));
-        final User user = userRepository.findById(appUser.getId())
-            .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
-        checkAvailibleForUser(user, id);
-        log.debug("Deleting story {}", id);
-        storyRepository.deleteById(id);
+        AppUser.getCurrentUser().ifPresent(appUser -> {
+            final User user = userRepository.findById(appUser.getId())
+                .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+            checkAvailibleForUser(user, id);
+            log.debug("Deleting story {}", id);
+            storyRepository.deleteById(id);
+        });
     }
 
     private void checkAvailibleForUser(User user, Long storyId) {
         if (!storyRepository.getById(storyId).getUser().equals(user)) {
             log.error("Tried to operate story {} by another user {}", storyId, user);
-            throw new InternalException(InternalErrorType.ACCESS_DENIED);
+            throw new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE);
         }
     }
 }
