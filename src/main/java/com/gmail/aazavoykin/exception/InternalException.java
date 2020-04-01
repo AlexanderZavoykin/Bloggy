@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class InternalException extends RuntimeException {
 
-    private InternalErrorType errorType;
+    private final InternalErrorType errorType;
 
     public InternalException(InternalErrorType errorType) {
         super(errorType.name() + ":" + errorType.getMessage());

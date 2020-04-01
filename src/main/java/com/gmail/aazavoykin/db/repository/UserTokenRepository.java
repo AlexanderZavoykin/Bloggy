@@ -8,6 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface UserTokenRepository extends CrudRepository<UserToken, Long> {
 
     UserToken findByToken(String token);
-
     UserToken findByUserId(Long id);
 }

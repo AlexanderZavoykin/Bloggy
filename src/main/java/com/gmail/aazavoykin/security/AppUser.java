@@ -20,10 +20,6 @@ public class AppUser extends User {
         this.id = id;
     }
 
-    public Long getId() {
-        return id;
-    }
-
     public static Optional<AppUser> getCurrentUser() {
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
             .filter(Authentication::isAuthenticated)
@@ -31,7 +27,20 @@ public class AppUser extends User {
             .map(a -> (AppUser) a.getPrincipal());
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public <R extends Enum> boolean hasRole(final R e) {
         return getAuthorities().contains(new SimpleGrantedAuthority(e.name()));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        AppUser appUser = (AppUser) o;
+        return id.equals(appUser.id);
     }
 }

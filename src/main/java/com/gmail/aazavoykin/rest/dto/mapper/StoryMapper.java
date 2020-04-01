@@ -1,16 +1,11 @@
 package com.gmail.aazavoykin.rest.dto.mapper;
 
 import com.gmail.aazavoykin.db.model.Story;
-import com.gmail.aazavoykin.db.model.Tag;
 import com.gmail.aazavoykin.rest.dto.StoryDto;
-import com.gmail.aazavoykin.rest.dto.TagDto;
-import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", uses = {TagMapper.class, CommentMapper.class})
 public interface StoryMapper {
