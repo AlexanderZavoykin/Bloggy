@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
 
+    private static final String HIDDEN_EMAIL = "NOT_AVAILABLE";
     private final AppProperties appProperties;
     private final UserMapper userMapper;
     private final MailService mailService;
@@ -82,7 +83,7 @@ public class UserService {
             .setUser(savedUser)
             .setToken(UUID.randomUUID().toString())
             .setExpiryDate(LocalDateTime.now().plus(appProperties.getAuth().getSignup().getLifetime(), ChronoUnit.DAYS)));
-        mailService.sendVerificationUrl(savedUser.getEmail(), savedToken.getToken());
+        mailService.sendActivationUrl(savedUser.getEmail(), savedToken.getToken());
     }
 
     @Transactional
@@ -160,7 +161,7 @@ public class UserService {
     private UserDto hideEmail(UserDto userDto) {
         final boolean isAdmin = AppUser.getCurrentUser().map(appUser -> appUser.hasRole(Role.ADMIN)).orElse(false);
         if (!isAdmin) {
-            userDto.setEmail("NOT_AVAILABLE");
+            userDto.setEmail(HIDDEN_EMAIL);
         }
         return userDto;
     }
