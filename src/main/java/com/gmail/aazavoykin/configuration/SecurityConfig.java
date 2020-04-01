@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -25,6 +26,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
+import java.util.Date;
 import java.util.Optional;
 
 @Slf4j
@@ -41,6 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final BloggyAuthenticationFailureHandler authenticationFailureHandler;
     private final BloggyAuthenticationSuccessHandler authenticationSuccessHandler;
     private final BloggyAuthenticationEntryPoint authenticationEntryPoint;
+    private final ThreadPoolTaskScheduler scheduler;
 
     @Bean
     public ApplicationListener<AuthenticationFailureBadCredentialsEvent> failureAuthenticationListener() {
@@ -52,7 +55,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 log.debug("Counted {} login failures for last 30 minutes for email {}", last30MinAttemptsNum, email);
                 if (last30MinAttemptsNum > appProperties.getAuth().getSignin().getTries()) {
                     userService.setEnabled(user.getId(), false);
-                    // TODO add task to set enabled back to true after 30 minutes
+                    scheduler.schedule(() -> userService.setEnabled(user.getId(), true),
+                        new Date(System.currentTimeMillis() + appProperties.getAuth().getSignin().getBreaktime() * 60 * 1000));
                 }
             });
         };
@@ -67,7 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-ui.html");
     }
 
