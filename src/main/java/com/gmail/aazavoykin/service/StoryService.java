@@ -98,6 +98,7 @@ public class StoryService {
                 .orElse(null);
             found.setTags(requestTags);
             final Story updated = storyRepository.saveAndFlush(found);
+            tagRepository.removeOrphans();
             log.debug("Updated story {}", updated);
             return storyMapper.storyToStoryDto(updated);
         }).orElse(null);
@@ -110,6 +111,7 @@ public class StoryService {
             checkAvailibleForUser(user, id);
             log.debug("Deleting story {}", id);
             storyRepository.deleteById(id);
+            tagRepository.removeOrphans();
         });
     }
 
