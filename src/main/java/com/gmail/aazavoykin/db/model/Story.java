@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,15 +33,15 @@ public class Story {
     @Column(name = "story_id")
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "story_user_fk"))
     private User user;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(name = "story_tag",
-        joinColumns = @JoinColumn(name = "story_id"),
-        inverseJoinColumns = @JoinColumn(name = "tag_id"))
+        joinColumns = @JoinColumn(name = "story_id", foreignKey = @ForeignKey(name = "story_tag_story_fk")),
+        inverseJoinColumns = @JoinColumn(name = "tag_id"), foreignKey = @ForeignKey(name = "story_tag_tag_fk"))
     private List<Tag> tags = new ArrayList<>();
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "story_id")
+    @JoinColumn(name = "story_id", foreignKey = @ForeignKey(name = "comment_story_fk"))
     private List<Comment> comments = new ArrayList<>();
     @CreationTimestamp
     @Column(nullable = false)

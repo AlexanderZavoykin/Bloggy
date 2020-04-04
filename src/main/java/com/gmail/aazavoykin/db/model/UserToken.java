@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,7 +28,7 @@ public class UserToken {
     @Column(name = "user_token_id")
     private Long id;
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "user_token_user_fk"))
     private User user;
     @Column(columnDefinition = "VARCHAR(36)", nullable = false)
     private String token;
