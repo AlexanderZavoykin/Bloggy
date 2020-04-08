@@ -51,7 +51,7 @@ public class User {
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), foreignKey = @ForeignKey(name = "role_user_fk"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
-    @Column(columnDefinition = "VARCHAR(120)", nullable = false)
+    @Column(columnDefinition = "VARCHAR(255)", nullable = false)
     private String email;
     @Column(columnDefinition = "VARCHAR(60)", nullable = false)
     private String password;

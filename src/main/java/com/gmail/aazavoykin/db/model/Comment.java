@@ -28,7 +28,7 @@ public class Comment {
     @Column(name = "comment_id")
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "comment_user_fk"))
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "comment_user_fk"), nullable = false)
     private User user;
     @CreationTimestamp
     @Column(nullable = false)
