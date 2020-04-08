@@ -11,6 +11,7 @@ import com.gmail.aazavoykin.db.repository.UserTokenRepository;
 import com.gmail.aazavoykin.exception.InternalErrorType;
 import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.UserDto;
+import com.gmail.aazavoykin.rest.dto.mapper.ExtendedUserMapper;
 import com.gmail.aazavoykin.rest.dto.mapper.UserMapper;
 import com.gmail.aazavoykin.rest.request.ChangePasswordRequest;
 import com.gmail.aazavoykin.rest.request.UpdateUserInfoRequest;
@@ -40,25 +41,47 @@ public class UserService {
     private static final String HIDDEN_EMAIL = "NOT_AVAILABLE";
     private final AppProperties appProperties;
     private final UserMapper userMapper;
+    private final ExtendedUserMapper extendedUserMapper;
     private final MailService mailService;
     private final UserRepository userRepository;
     private final UserTokenRepository tokenRepository;
     private final LoginAttemptRepository loginAttemptRepository;
     private final PasswordEncoder encoder;
 
-    public List<UserDto> getAll() {
-        return userMapper.usersToUserDtos(userRepository.getAllByOrderByNickname())
-            .stream().map(this::hideEmail).collect(Collectors.toList());
+    /*
+    If requested by Admin shows extended DTOs for found users,
+    else shows only enabled (activated) users` simple DTOs and hide e-mails
+     */
+    public List<? extends UserDto> getAll() {
+        final List<User> users = userRepository.getAllByOrderByNickname();
+        if (AppUser.getCurrentUser().filter(appUser -> appUser.hasRole(Role.ADMIN)).isPresent()) {
+            return extendedUserMapper.usersToExtendedUserDtos(users);
+        } else {
+            return users.stream()
+                .filter(User::isEnabled)
+                .map(user -> hideEmail(userMapper.userToUserDto(user)))
+                .collect(Collectors.toList());
+        }
     }
 
     public User getByEmail(String email) {
         return userRepository.getByEmail(email);
     }
 
+    /*
+    If requested by Admin shows extended DTO for a found user,
+    else shows only enabled (activated) user`s simple DTO and hide e-mail
+     */
     public UserDto getByNickname(String nickname) {
         final User user = Optional.ofNullable(userRepository.getByNickname(nickname)).orElseThrow(() ->
             new InternalException(InternalErrorType.USER_NOT_FOUND));
-        return hideEmail(userMapper.userToUserDto(user));
+        if (AppUser.getCurrentUser().filter(appUser -> appUser.hasRole(Role.ADMIN)).isPresent()) {
+            return extendedUserMapper.userToExtendedUserDto(user);
+        } else if (user.isEnabled()) {
+            return hideEmail(userMapper.userToUserDto(user));
+        } else {
+            throw new InternalException(InternalErrorType.USER_NOT_FOUND);
+        }
     }
 
     @Transactional

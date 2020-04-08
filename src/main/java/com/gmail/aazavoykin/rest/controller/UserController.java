@@ -32,7 +32,7 @@ public class UserController {
     private final CommentService commentService;
 
     @GetMapping("users")
-    public Response<List<UserDto>> all() {
+    public Response<List<? extends UserDto>> all() {
         return Response.success(userService.getAll());
     }
 
