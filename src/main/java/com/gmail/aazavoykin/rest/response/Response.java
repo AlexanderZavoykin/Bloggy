@@ -1,10 +1,14 @@
 package com.gmail.aazavoykin.rest.response;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.http.HttpStatus;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Accessors(chain = true)
 public class Response<T> {
 

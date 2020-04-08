@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
-
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler extends DefaultHandlerExceptionResolver {
