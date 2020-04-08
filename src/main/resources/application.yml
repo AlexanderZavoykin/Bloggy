@@ -3,15 +3,23 @@ spring:
     url: jdbc:postgresql://localhost:5432/bloggydb
     username: bloggy
     password: bloggy
-    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
     hibernate:
       ddl-auto: update
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
-  properties:
-    hibernate:
-      format_sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  mail:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
 
 server:
   port: 8090
