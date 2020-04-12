@@ -71,7 +71,7 @@ public class UserService {
     }
 
     public User getByEmail(String email) {
-        return userRepository.getByEmail(email);
+        return userRepository.getByEmailIgnoreCase(email);
     }
 
     /*
@@ -79,7 +79,7 @@ public class UserService {
     else returns only enabled (activated) user`s simple DTO and hide e-mail
      */
     public UserDto getByNickname(String nickname) {
-        final User user = Optional.ofNullable(userRepository.getByNickname(nickname)).orElseThrow(() ->
+        final User user = Optional.ofNullable(userRepository.getByNicknameIgnoreCase(nickname)).orElseThrow(() ->
             new InternalException(InternalErrorType.USER_NOT_FOUND));
         if (AppUser.getCurrentUser().filter(appUser -> appUser.hasRole(Role.ADMIN)).isPresent()) {
             return extendedUserMapper.userToExtendedUserDto(user);
@@ -131,7 +131,7 @@ public class UserService {
 
     @Transactional
     public void sendResetPasswordUrl(String email) {
-        final User user = Optional.ofNullable(userRepository.getByEmail(email))
+        final User user = Optional.ofNullable(userRepository.getByEmailIgnoreCase(email))
             .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
         final UserToken token = Optional.ofNullable(tokenRepository.findByUserId(user.getId()))
             .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_NOT_FOUND))
@@ -174,13 +174,13 @@ public class UserService {
     }
 
     private void checkEmailNotExists(String email) {
-        if (userRepository.getByEmail(email) != null) {
+        if (userRepository.getByEmailIgnoreCase(email) != null) {
             throw new InternalException(InternalErrorType.USER_ALREADY_EXISTS);
         }
     }
 
     private void checkNicknameNotExists(String nickname) {
-        if (userRepository.getByNickname(nickname) != null) {
+        if (userRepository.getByNicknameIgnoreCase(nickname) != null) {
             throw new InternalException(InternalErrorType.USER_ALREADY_EXISTS);
         }
     }

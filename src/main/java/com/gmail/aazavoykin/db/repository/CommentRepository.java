@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends CrudRepository<Comment, Long> {
 
-    List<Comment> getAllByUserNickname(String nickname);
+    List<Comment> getAllByUserNicknameIgnoreCase(String nickname);
 }

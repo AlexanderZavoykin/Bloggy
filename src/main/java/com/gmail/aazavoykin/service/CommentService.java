@@ -34,7 +34,7 @@ public class CommentService {
     private final StoryService storyService;
 
     public List<CommentDto> getAllByAuthorNickname(String nickname) {
-        return commentMapper.commentsToCommentDtos(commentRepository.getAllByUserNickname(nickname));
+        return commentMapper.commentsToCommentDtos(commentRepository.getAllByUserNicknameIgnoreCase(nickname));
     }
 
     @Transactional

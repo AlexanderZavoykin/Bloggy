@@ -40,7 +40,7 @@ public class StoryService {
      */
     public List<StoryDto> getAll(String tagName) {
         final List<Story> stories = Optional.ofNullable(tagName)
-            .map(tn -> storyRepository.getAllByTags_Name(tagName))
+            .map(tn -> storyRepository.getAllByTags_NameIgnoreCase(tagName))
             .orElse(storyRepository.getAllByRoughFalseOrderByCreatedDesc());
         return storyMapper.storiesToStoryDtos(stories);
     }
@@ -74,7 +74,7 @@ public class StoryService {
     Else returns all not-rough stories` DTOs for this user
      */
     public List<StoryDto> getAllByUserNickname(String nickname) {
-        final User user = Optional.ofNullable(userRepository.getByNickname(nickname))
+        final User user = Optional.ofNullable(userRepository.getByNicknameIgnoreCase(nickname))
             .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
         final Optional<AppUser> optionalAppUser = AppUser.getCurrentUser();
         boolean isHimself = optionalAppUser.map(appUser -> {
@@ -85,9 +85,9 @@ public class StoryService {
         boolean isAdmin = optionalAppUser.map(appUser -> appUser.hasRole(Role.ADMIN)).orElse(false);
         final List<Story> stories;
         if (isHimself) {
-            stories = storyRepository.getAllByUserNickname(nickname);
+            stories = storyRepository.getAllByUserNicknameIgnoreCase(nickname);
         } else if (user.isEnabled() || isAdmin) {
-            stories = storyRepository.getAllByUserNicknameAndRoughFalse(nickname);
+            stories = storyRepository.getAllByUserNicknameIgnoreCaseAndRoughFalse(nickname);
         } else {
             throw new InternalException(InternalErrorType.USER_NOT_FOUND);
         }
@@ -105,7 +105,7 @@ public class StoryService {
             story.setBody(request.getBody());
             final List<Tag> requestTags = Optional.ofNullable(request.getTagNames())
                 .map(tagNames -> tagNames.stream()
-                    .map(tagName -> Optional.ofNullable(tagRepository.getByName(tagName)).orElse(new Tag(tagName)))
+                    .map(tagName -> Optional.ofNullable(tagRepository.getByNameIgnoreCase(tagName)).orElse(new Tag(tagName)))
                     .collect(Collectors.toList()))
                 .orElse(null);
             story.setTags(requestTags);
@@ -128,7 +128,7 @@ public class StoryService {
             found.setRough(request.isRough());
             final List<Tag> requestTags = Optional.ofNullable(request.getTagNames())
                 .map(tagNames -> tagNames.stream()
-                    .map(tagName -> Optional.ofNullable(tagRepository.getByName(tagName)).orElse(new Tag(tagName)))
+                    .map(tagName -> Optional.ofNullable(tagRepository.getByNameIgnoreCase(tagName)).orElse(new Tag(tagName)))
                     .collect(Collectors.toList()))
                 .orElse(null);
             found.setTags(requestTags);

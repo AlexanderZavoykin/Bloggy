@@ -12,7 +12,7 @@ import java.util.List;
 public interface TagRepository extends CrudRepository<Tag, Long> {
 
     List<Tag> getAllByOrderByName();
-    Tag getByName(String name);
+    Tag getByNameIgnoreCase(String name);
     @Modifying
     @Query(value = "delete from tag t where t.tag_id not in (select st.tag_id from story_tag st)", nativeQuery = true)
     void removeOrphans();
