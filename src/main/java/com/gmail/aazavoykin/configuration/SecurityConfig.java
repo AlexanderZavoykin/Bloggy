@@ -4,9 +4,9 @@ import com.gmail.aazavoykin.configuration.properties.AppProperties;
 import com.gmail.aazavoykin.db.model.User;
 import com.gmail.aazavoykin.security.AppUser;
 import com.gmail.aazavoykin.security.AppUserDetailsService;
-import com.gmail.aazavoykin.security.BloggyAuthenticationEntryPoint;
-import com.gmail.aazavoykin.security.BloggyAuthenticationFailureHandler;
-import com.gmail.aazavoykin.security.BloggyAuthenticationSuccessHandler;
+import com.gmail.aazavoykin.security.AppAuthenticationEntryPoint;
+import com.gmail.aazavoykin.security.AppAuthenticationFailureHandler;
+import com.gmail.aazavoykin.security.AppAuthenticationSuccessHandler;
 import com.gmail.aazavoykin.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,9 +40,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserService userService;
     private final AppUserDetailsService userDetailsService;
     private final AppProperties appProperties;
-    private final BloggyAuthenticationFailureHandler authenticationFailureHandler;
-    private final BloggyAuthenticationSuccessHandler authenticationSuccessHandler;
-    private final BloggyAuthenticationEntryPoint authenticationEntryPoint;
+    private final AppAuthenticationFailureHandler authenticationFailureHandler;
+    private final AppAuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AppAuthenticationEntryPoint authenticationEntryPoint;
     private final ThreadPoolTaskScheduler scheduler;
 
     @Bean

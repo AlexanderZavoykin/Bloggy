@@ -12,9 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class BloggyAuthenticationEntryPoint extends ResponseHandler implements AuthenticationEntryPoint {
+public class AppAuthenticationEntryPoint extends ResponseHandler implements AuthenticationEntryPoint {
 
-    public BloggyAuthenticationEntryPoint(ObjectMapper objectMapper) {
+    public AppAuthenticationEntryPoint(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 

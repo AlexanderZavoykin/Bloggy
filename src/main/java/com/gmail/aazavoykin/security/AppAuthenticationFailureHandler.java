@@ -12,9 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class BloggyAuthenticationFailureHandler extends ResponseHandler implements AuthenticationFailureHandler {
+public class AppAuthenticationFailureHandler extends ResponseHandler implements AuthenticationFailureHandler {
 
-    public BloggyAuthenticationFailureHandler(ObjectMapper objectMapper) {
+    public AppAuthenticationFailureHandler(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 
