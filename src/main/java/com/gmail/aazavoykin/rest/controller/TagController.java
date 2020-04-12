@@ -12,12 +12,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("tag")
+@RequestMapping("tags")
 public class TagController {
 
     private final TagService tagService;
 
-    @GetMapping("tags")
+    @GetMapping("all")
     public Response<List<TagDto>> getAll() {
         return Response.success(tagService.getAll());
     }

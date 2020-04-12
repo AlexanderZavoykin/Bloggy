@@ -96,9 +96,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .authorizeRequests()
-            .antMatchers("/login", "/user/auth/**", "/user/password/**").anonymous()
-            .antMatchers("/story/stories", "/story/last10", "/story/{id}", "/story/tag/{tag}", "/tag/tags",
-                "/user/users", "/user/{nickname}/**").permitAll();
+            .antMatchers("/login", "/users/auth/**", "/users/password/**").anonymous()
+            .antMatchers("/stories", "/stories/last10", "/stories/{id}", "/tags/all",
+                "/users", "/users/{nickname}/**").permitAll();
     }
 }
 

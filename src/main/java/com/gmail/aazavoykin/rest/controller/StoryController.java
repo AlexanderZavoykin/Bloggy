@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -20,15 +21,15 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("story")
+@RequestMapping("stories")
 public class StoryController {
 
     private final StoryService storyService;
     private final CommentService commentService;
 
-    @GetMapping("stories")
-    public Response<List<StoryDto>> all() {
-        return Response.success(storyService.getAll());
+    @GetMapping("all")
+    public Response<List<StoryDto>> all(@RequestParam(required = false) String tagName) {
+        return Response.success(storyService.getAll(tagName));
     }
 
     @GetMapping("last10")
@@ -41,11 +42,6 @@ public class StoryController {
         return Response.success(storyService.getById(id));
     }
 
-    @GetMapping("tag/{tag}")
-    public Response<List<StoryDto>> getByTag(@PathVariable("tag") String tagname) {
-        return Response.success(storyService.getAlByTag(tagname));
-    }
-
     @PostMapping("{id}/comment")
     public Response<StoryDto> addComment(@PathVariable("id") Long storyId, @Valid @RequestBody CommentStoryRequest request) {
         return Response.success(commentService.addComment(storyId, request.getBody()));
@@ -56,12 +52,12 @@ public class StoryController {
         return Response.success(storyService.save(request));
     }
 
-    @PostMapping("update")
-    public Response<StoryDto> update(@Valid @RequestBody StoryUpdateRequest request) {
-        return Response.success(storyService.update(request));
+    @PostMapping("{id}/update")
+    public Response<StoryDto> update(@PathVariable("id") Long storyId, @Valid @RequestBody StoryUpdateRequest request) {
+        return Response.success(storyService.update(storyId, request));
     }
 
-    @PostMapping("delete/{id}")
+    @PostMapping("{id}/delete")
     public Response<Void> delete(@PathVariable("id") Long id) {
         storyService.delete(id);
         return Response.success();

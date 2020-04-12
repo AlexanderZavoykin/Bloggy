@@ -24,14 +24,14 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("user")
+@RequestMapping("users")
 public class UserController {
 
     private final UserService userService;
     private final StoryService storyService;
     private final CommentService commentService;
 
-    @GetMapping("users")
+    @GetMapping("all")
     public Response<List<? extends UserDto>> all() {
         return Response.success(userService.getAll());
     }
@@ -75,7 +75,7 @@ public class UserController {
         return Response.success();
     }
 
-    @PostMapping("update")
+    @PostMapping("update-info")
     public Response<Void> updateInfo(@RequestBody UpdateUserInfoRequest request) {
         userService.updateInfo(request);
         return Response.success();
