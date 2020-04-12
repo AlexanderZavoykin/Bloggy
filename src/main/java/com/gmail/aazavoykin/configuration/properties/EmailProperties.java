@@ -25,21 +25,21 @@ public class EmailProperties {
     public static class TemplateProperties {
 
         private final AuthProperties auth;
-    }
 
-    @Data
-    public static class AuthProperties {
+        @Data
+        public static class AuthProperties {
 
-        private final MessageProperties activation;
-        private final MessageProperties confirmation;
-        private final MessageProperties reset;
-        private final MessageProperties success;
-    }
+            private final MessageProperties activation;
+            private final MessageProperties registrationConfirmation;
+            private final MessageProperties resetPassword;
+            private final MessageProperties changePasswordSuccess;
 
-    @Data
-    public static class MessageProperties {
+            @Data
+            public static class MessageProperties {
 
-        private final String subject;
-        private final String body;
+                private final String subject;
+                private final String body;
+            }
+        }
     }
 }

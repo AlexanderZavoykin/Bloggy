@@ -17,25 +17,25 @@ public class AppProperties {
 
         private final SigninProperties signin;
         private final SignupProperties signup;
-        private final ForgotProperties forgot;
-    }
+        private final ForgotPasswordProperties forgotPassword;
 
-    @Data
-    public static class SigninProperties {
+        @Data
+        public static class SigninProperties {
 
-        private final int tries;
-        private final long breaktime;
-    }
+            private final int tries;
+            private final long breaktime;
+        }
 
-    @Data
-    public static class SignupProperties {
+        @Data
+        public static class SignupProperties {
 
-        private final int lifetime;
-    }
+            private final int lifetime;
+        }
 
-    @Data
-    public static class ForgotProperties {
+        @Data
+        public static class ForgotPasswordProperties {
 
-        private final int lifetime;
+            private final int lifetime;
+        }
     }
 }
