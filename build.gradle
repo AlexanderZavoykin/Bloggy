@@ -34,10 +34,20 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-security'
     compile 'org.springframework.boot:spring-boot-starter-mail'
     compile 'org.postgresql:postgresql'
-    compile 'org.webjars:bootstrap:4.4.1'
-    compile 'io.jsonwebtoken:jjwt:0.9.1'
     compile 'io.springfox:springfox-swagger2:2.9.2'
     compile 'io.springfox:springfox-swagger-ui:2.9.2'
+    compile 'org.mapstruct:mapstruct-processor:1.3.1.Final'
+    compile 'org.mapstruct:mapstruct-jdk8:1.3.1.Final'
     implementation 'org.mapstruct:mapstruct:1.3.1.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final'
+
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'com.h2database:h2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine'
+    testCompile 'org.junit.platform:junit-platform-runner:1.0.0-M4'
+}
+
+test {
+    useJUnitPlatform()
 }
