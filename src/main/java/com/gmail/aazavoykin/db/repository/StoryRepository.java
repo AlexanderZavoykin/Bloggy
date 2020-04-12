@@ -14,5 +14,5 @@ public interface StoryRepository extends JpaRepository<Story, Long> {
     List<Story> getTop10ByRoughFalseOrderByCreatedDesc();
     List<Story> getAllByTags_Name( String tagName);
     List<Story> getAllByUserNicknameAndRoughFalse(String nickname);
-    List<Story> getAllByUserNicknameAndRoughTrue(String nickname);
+    List<Story> getAllByUserNickname(String nickname);
 }
