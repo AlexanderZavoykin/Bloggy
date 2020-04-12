@@ -3,6 +3,7 @@ package com.gmail.aazavoykin.service;
 import com.gmail.aazavoykin.db.model.Story;
 import com.gmail.aazavoykin.db.model.Tag;
 import com.gmail.aazavoykin.db.model.User;
+import com.gmail.aazavoykin.db.model.enums.Role;
 import com.gmail.aazavoykin.db.repository.StoryRepository;
 import com.gmail.aazavoykin.db.repository.TagRepository;
 import com.gmail.aazavoykin.db.repository.UserRepository;
@@ -33,30 +34,64 @@ public class StoryService {
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
 
-    public List<StoryDto> getAll() {
-        return storyMapper.storiesToStoryDtos(storyRepository.getAllByRoughFalseOrderByCreatedDesc());
+    /*
+    If tagName is presented then returns DTOs filtered by it,
+    else returns all not-rough stories` DTOs
+     */
+    public List<StoryDto> getAll(String tagName) {
+        final List<Story> stories = Optional.ofNullable(tagName)
+            .map(tn -> storyRepository.getAllByTags_Name(tagName))
+            .orElse(storyRepository.getAllByRoughFalseOrderByCreatedDesc());
+        return storyMapper.storiesToStoryDtos(stories);
     }
 
     public List<StoryDto> getLast10() {
         return storyMapper.storiesToStoryDtos(storyRepository.getTop10ByRoughFalseOrderByCreatedDesc());
     }
 
+    /*
+    If requested story is rough then returns it only for its author
+     */
     public StoryDto getById(Long id) {
-        final Story story = storyRepository.findById(id).orElseThrow(() ->
-            new InternalException(InternalErrorType.STORY_NOT_FOUND));
-        return storyMapper.storyToStoryDto(story);
+        final Story story = storyRepository.findById(id)
+            .orElseThrow(() -> new InternalException(InternalErrorType.STORY_NOT_FOUND));
+        final StoryDto storyDto = storyMapper.storyToStoryDto(story);
+        if (story.isRough()) {
+            AppUser.getCurrentUser().ifPresent(appUser -> {
+                final User user = userRepository.findById(appUser.getId())
+                    .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+                if (!story.getUser().equals(user)) {
+                    throw new InternalException(InternalErrorType.STORY_NOT_FOUND);
+                }
+            });
+        }
+        return storyDto;
     }
 
-    public List<StoryDto> getAlByTag(String tagName) {
-        return storyMapper.storiesToStoryDtos(storyRepository.getAllByTags_Name(tagName));
-    }
-
+    /*
+    If requested by user with its own nickname then returns all stories including the rough ones
+    If user found by this nickname is disabled, returns its not-rough stories` DTOs only for Admin
+    Else returns all not-rough stories` DTOs for this user
+     */
     public List<StoryDto> getAllByUserNickname(String nickname) {
-        return storyMapper.storiesToStoryDtos(storyRepository.getAllByUserNicknameAndRoughFalse(nickname));
-    }
-
-    public List<StoryDto> getRoughByUserNickname(String nickname) {
-        return storyMapper.storiesToStoryDtos(storyRepository.getAllByUserNicknameAndRoughTrue(nickname));
+        final User user = Optional.ofNullable(userRepository.getByNickname(nickname))
+            .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+        final Optional<AppUser> optionalAppUser = AppUser.getCurrentUser();
+        boolean isHimself = optionalAppUser.map(appUser -> {
+                final User authenticated = userRepository.getById(appUser.getId());
+                return authenticated.equals(user);
+            }
+        ).orElse(false);
+        boolean isAdmin = optionalAppUser.map(appUser -> appUser.hasRole(Role.ADMIN)).orElse(false);
+        final List<Story> stories;
+        if (isHimself) {
+            stories = storyRepository.getAllByUserNickname(nickname);
+        } else if (user.isEnabled() || isAdmin) {
+            stories = storyRepository.getAllByUserNicknameAndRoughFalse(nickname);
+        } else {
+            throw new InternalException(InternalErrorType.USER_NOT_FOUND);
+        }
+        return storyMapper.storiesToStoryDtos(stories);
     }
 
     @Transactional
@@ -81,13 +116,13 @@ public class StoryService {
     }
 
     @Transactional
-    public StoryDto update(StoryUpdateRequest request) {
+    public StoryDto update(Long storyId, StoryUpdateRequest request) {
         return AppUser.getCurrentUser().map(appUser -> {
             final User user = userRepository.findById(appUser.getId())
                 .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
-            final Story found = Optional.ofNullable(storyRepository.getById(request.getId()))
+            final Story found = Optional.ofNullable(storyRepository.getById(storyId))
                 .orElseThrow(() -> new InternalException(InternalErrorType.STORY_NOT_FOUND));
-            checkAvailibleForUser(user, request.getId());
+            checkAvailibleForUser(user, storyId);
             found.setTitle(request.getTitle());
             found.setBody(request.getBody());
             found.setRough(request.isRough());
@@ -104,6 +139,7 @@ public class StoryService {
         }).orElse(null);
     }
 
+    @Transactional
     public void delete(Long id) {
         AppUser.getCurrentUser().ifPresent(appUser -> {
             final User user = userRepository.findById(appUser.getId())

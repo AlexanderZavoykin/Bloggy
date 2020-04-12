@@ -48,9 +48,15 @@ public class UserService {
     private final LoginAttemptRepository loginAttemptRepository;
     private final PasswordEncoder encoder;
 
+    private static void checkExpired(UserToken token) {
+        if (!LocalDateTime.now().isBefore(token.getExpiryDate())) {
+            throw new InternalException(InternalErrorType.TOKEN_DATE_EXPIRED);
+        }
+    }
+
     /*
-    If requested by Admin shows extended DTOs for found users,
-    else shows only enabled (activated) users` simple DTOs and hide e-mails
+    If requested by Admin returns extended DTOs for found users,
+    else returns only enabled (activated) users` simple DTOs and hide e-mails
      */
     public List<? extends UserDto> getAll() {
         final List<User> users = userRepository.getAllByOrderByNickname();
@@ -69,8 +75,8 @@ public class UserService {
     }
 
     /*
-    If requested by Admin shows extended DTO for a found user,
-    else shows only enabled (activated) user`s simple DTO and hide e-mail
+    If requested by Admin returns extended DTO for a found user,
+    else returns only enabled (activated) user`s simple DTO and hide e-mail
      */
     public UserDto getByNickname(String nickname) {
         final User user = Optional.ofNullable(userRepository.getByNickname(nickname)).orElseThrow(() ->
@@ -113,8 +119,7 @@ public class UserService {
     public void activate(String token) {
         final UserToken foundToken = Optional.ofNullable(tokenRepository.findByToken(token))
             .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_NOT_FOUND));
-        Optional.of(foundToken).filter(userToken -> LocalDateTime.now().isBefore(userToken.getExpiryDate()))
-            .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_DATE_EXPIRED));
+        checkExpired(foundToken);
         final User user = foundToken.getUser();
         if (!user.isEnabled()) {
             user.setEnabled(true);
@@ -130,7 +135,7 @@ public class UserService {
             .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
         final UserToken token = Optional.ofNullable(tokenRepository.findByUserId(user.getId()))
             .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_NOT_FOUND))
-            .setExpiryDate(LocalDateTime.now().plus(appProperties.getAuth().getForgot().getLifetime(), ChronoUnit.DAYS))
+            .setExpiryDate(LocalDateTime.now().plus(appProperties.getAuth().getForgotPassword().getLifetime(), ChronoUnit.DAYS))
             .setToken(UUID.randomUUID().toString());
         mailService.sendPasswordResetUrl(email, token.getToken());
     }
@@ -139,8 +144,7 @@ public class UserService {
     public void changePassword(ChangePasswordRequest request, String token) {
         final UserToken foundToken = Optional.ofNullable(tokenRepository.findByToken(token))
             .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_NOT_FOUND));
-        Optional.of(foundToken).filter(userToken -> LocalDateTime.now().isBefore(userToken.getExpiryDate()))
-            .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_DATE_EXPIRED));
+        checkExpired(foundToken);
         ValidationUtils.checkMatchingPassword(request.getPassword(), request.getMatchingPassword());
         final User user = foundToken.getUser();
         final String encodedPassword = encoder.encode(request.getPassword());
@@ -180,6 +184,7 @@ public class UserService {
             throw new InternalException(InternalErrorType.USER_ALREADY_EXISTS);
         }
     }
+
 
     private UserDto hideEmail(UserDto userDto) {
         final boolean isAdmin = AppUser.getCurrentUser().map(appUser -> appUser.hasRole(Role.ADMIN)).orElse(false);
