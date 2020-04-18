@@ -84,7 +84,7 @@ public class UserService {
             new InternalException(InternalErrorType.USER_NOT_FOUND));
         if (AppUser.getCurrentUser().filter(appUser -> appUser.hasRole(Role.ADMIN)).isPresent()) {
             return extendedUserMapper.userToExtendedUserDto(user);
-        } else if (user.isEnabled()) {
+        } else if (user.isEnabled() && user.getRoles().contains(Role.USER)) {
             return hideEmail(userMapper.userToUserDto(user));
         } else {
             throw new InternalException(InternalErrorType.USER_NOT_FOUND);
