@@ -135,9 +135,14 @@ public class UserService {
         final User user = Optional.ofNullable(userRepository.getByEmailIgnoreCase(email))
             .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
         final UserToken token = Optional.ofNullable(tokenRepository.findByUserId(user.getId()))
-            .orElseThrow(() -> new InternalException(InternalErrorType.TOKEN_NOT_FOUND))
+            .orElseGet(() -> {
+                final UserToken newToken = new UserToken();
+                newToken.setUser(user);
+                return newToken;
+            })
             .setExpiryDate(LocalDateTime.now().plus(appProperties.getAuth().getForgotPassword().getLifetime(), ChronoUnit.DAYS))
             .setToken(UUID.randomUUID().toString());
+        tokenRepository.saveAndFlush(token);
         mailService.sendPasswordResetUrl(email, token.getToken());
     }
 
