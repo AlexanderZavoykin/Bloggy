@@ -55,8 +55,9 @@ public class UserService {
     }
 
     /*
-    If requested by Admin returns extended DTOs for found users,
-    else returns only enabled (activated) users` simple DTOs and hide e-mails
+     * If requested by Admin returns extended DTOs for found users,
+     * else returns simple DTOs with hidden e-mails only for enabled (activated) users who have a USER role
+     * (pure ADMINs will not be showed)
      */
     public List<? extends UserDto> getAll() {
         final List<User> users = userRepository.getAllByOrderByNickname();
@@ -64,7 +65,7 @@ public class UserService {
             return extendedUserMapper.usersToExtendedUserDtos(users);
         } else {
             return users.stream()
-                .filter(User::isEnabled)
+                .filter(user -> user.isEnabled() && user.getRoles().contains(Role.USER))
                 .map(user -> hideEmail(userMapper.userToUserDto(user)))
                 .collect(Collectors.toList());
         }
@@ -75,8 +76,8 @@ public class UserService {
     }
 
     /*
-    If requested by Admin returns extended DTO for a found user,
-    else returns only enabled (activated) user`s simple DTO and hide e-mail
+     * If requested by Admin returns extended DTO for a found user,
+     * else returns only enabled (activated) user`s simple DTO and hide e-mail
      */
     public UserDto getByNickname(String nickname) {
         final User user = Optional.ofNullable(userRepository.getByNicknameIgnoreCase(nickname)).orElseThrow(() ->

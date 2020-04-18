@@ -35,8 +35,8 @@ public class StoryService {
     private final TagRepository tagRepository;
 
     /*
-    If tagName is presented then returns DTOs filtered by it,
-    else returns all not-rough stories` DTOs
+     * If tagName is presented then returns DTOs filtered by it,
+     * else returns all not-rough stories` DTOs
      */
     public List<StoryDto> getAll(String tagName) {
         final List<Story> stories = Optional.ofNullable(tagName)
@@ -50,7 +50,7 @@ public class StoryService {
     }
 
     /*
-    If requested story is rough then returns it only for its author
+     * If requested story is rough then returns it only for its author
      */
     public StoryDto getById(Long id) {
         final Story story = storyRepository.findById(id)
@@ -69,9 +69,9 @@ public class StoryService {
     }
 
     /*
-    If requested by user with its own nickname then returns all stories including the rough ones
-    If user found by this nickname is disabled, returns its not-rough stories` DTOs only for Admin
-    Else returns all not-rough stories` DTOs for this user
+     * If requested by user with its own nickname then returns all stories including the rough ones
+     * If user found by this nickname is disabled, returns its not-rough stories` DTOs only for Admin
+     * Else returns all not-rough stories` DTOs for this user
      */
     public List<StoryDto> getAllByUserNickname(String nickname) {
         final User user = Optional.ofNullable(userRepository.getByNicknameIgnoreCase(nickname))
