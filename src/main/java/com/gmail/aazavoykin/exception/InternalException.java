@@ -8,7 +8,7 @@ public class InternalException extends RuntimeException {
     private final InternalErrorType errorType;
 
     public InternalException(InternalErrorType errorType) {
-        super(errorType.name() + ":" + errorType.getMessage());
+        super(errorType.getMessage());
         this.errorType = errorType;
     }
 }
