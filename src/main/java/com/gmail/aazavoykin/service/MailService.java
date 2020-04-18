@@ -21,7 +21,7 @@ public class MailService {
         final EmailProperties.TemplateProperties.AuthProperties.MessageProperties activationProperties =
             emailProperties.getTemplate().getAuth().getActivation();
         sendMessage(to, activationProperties.getSubject(), String.format(activationProperties.getBody(),
-            appProperties.getHostname() + "/user/auth/activate/" + token));
+            appProperties.getHostname() + "/users/auth/activate/" + token));
     }
 
     public void sendSuccessfulRegistrationConfirmation(String to) {
@@ -34,7 +34,7 @@ public class MailService {
         final EmailProperties.TemplateProperties.AuthProperties.MessageProperties resetProperties =
             emailProperties.getTemplate().getAuth().getResetPassword();
         sendMessage(to, resetProperties.getSubject(), String.format(resetProperties.getBody(),
-            appProperties.getHostname() + "/user/password/change/" + token));
+            appProperties.getHostname() + "/users/password/change/" + token));
     }
 
     public void sendPasswordResetSuccessMessage(String to) {
