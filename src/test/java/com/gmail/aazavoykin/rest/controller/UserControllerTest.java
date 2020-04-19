@@ -1,72 +1,79 @@
 package com.gmail.aazavoykin.rest.controller;
 
-import com.gmail.aazavoykin.db.repository.LoginAttemptRepository;
+import com.gmail.aazavoykin.db.repository.UserRepository;
 import com.gmail.aazavoykin.exception.InternalException;
 import com.gmail.aazavoykin.rest.dto.UserDto;
 import com.gmail.aazavoykin.rest.request.ChangePasswordRequest;
 import com.gmail.aazavoykin.rest.request.ForgotPasswordRequest;
+import com.gmail.aazavoykin.rest.request.UpdateUserInfoRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.MailService;
 import com.gmail.aazavoykin.service.UserService;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-@Slf4j
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@ExtendWith(SpringExtension.class)
-class UserControllerTest {
+class UserControllerTest extends AbstractControllerTest {
 
-    private static final String TOKEN_NAME = "bloggytoken";
-    @Autowired
-    private TestRestTemplate restTemplate;
     @Autowired
     private UserService userService;
-    @MockBean
-    private LoginAttemptRepository loginAttemptRepository;
+    @Autowired
+    private UserRepository userRepository;
     @MockBean
     private MailService mailService;
 
-    private static HttpEntity<?> prepareHttpEntity(Object body, String token) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Cookie", token);
-        headers.add("Content-Type", "application/json;charset=utf-8");
-        return new HttpEntity<>(body, headers);
+    @Test
+    public void shouldGetOnlyEnabledUsers_byUnauthenticated() {
+        final ResponseEntity<Response<List<UserDto>>> response = restTemplate.exchange("/users/all",
+            HttpMethod.GET, null, new ParameterizedTypeReference<Response<List<UserDto>>>() {
+            });
+        final Response<List<UserDto>> body = response.getBody();
+        assertNotNull(body);
+        assertEquals("OK", body.getMessage());
+        assertEquals("200", body.getCode());
+        final List<UserDto> userDtos = body.getBody();
+        assertNotNull(userDtos);
+        assertEquals(1, userDtos.size());
+        final UserDto userDto = userDtos.get(0);
+        assertNotNull(userDto);
+        assertEquals(1000002L, (long) userDto.getId());
     }
 
     @Test
-    public void shouldNotGetUnactivatedUserDto_byUnauthorized() {
+    public void shouldAllUsers_byAdmin() {
+        final ResponseEntity<Response<List<UserDto>>> response = restTemplate.exchange("/users/all",
+            HttpMethod.GET,
+            prepareHttpEntity(null, getAdminAccessToken()),
+            new ParameterizedTypeReference<Response<List<UserDto>>>() {
+            });
+        final Response<List<UserDto>> body = response.getBody();
+        assertNotNull(body);
+        assertEquals("OK", body.getMessage());
+        assertEquals("200", body.getCode());
+        final List<UserDto> userDtos = body.getBody();
+        assertNotNull(userDtos);
+        assertEquals(3, userDtos.size());
+    }
+
+    @Test
+    public void shouldNotGetUnactivatedUserDto_byUnauthenticated() {
         final ResponseEntity<Response<Void>> response = restTemplate.exchange("/users/donaldduck",
             HttpMethod.GET, null, new ParameterizedTypeReference<Response<Void>>() {
             });
@@ -81,7 +88,7 @@ class UserControllerTest {
     public void shouldNotGetUnactivatedUserDto_bySingleUser() {
         final ResponseEntity<Response<Void>> response = restTemplate.exchange("/users/donaldduck",
             HttpMethod.GET,
-            prepareHttpEntity(null, getAccessToken("second@test.com", "testtest")),
+            prepareHttpEntity(null, getSingleUserAccessToken()),
             new ParameterizedTypeReference<Response<Void>>() {
             });
         final Response<Void> body = response.getBody();
@@ -95,7 +102,7 @@ class UserControllerTest {
     public void shouldGetUnactivatedUserDto_byAdmin() {
         final ResponseEntity<Response<UserDto>> response = restTemplate.exchange("/users/donaldduck",
             HttpMethod.GET,
-            prepareHttpEntity(null, getAccessToken("third@test.com", "testtest")),
+            prepareHttpEntity(null, getAdminAccessToken()),
             new ParameterizedTypeReference<Response<UserDto>>() {
             });
         final Response<UserDto> body = response.getBody();
@@ -113,7 +120,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void shouldGetActivatedUserDto_byUnauthorized() {
+    public void shouldGetActivatedUserDto_byUnauthenticated() {
         final ResponseEntity<Response<UserDto>> response = restTemplate.exchange("/users/charliesheen",
             HttpMethod.GET, null, new ParameterizedTypeReference<Response<UserDto>>() {
             });
@@ -135,7 +142,7 @@ class UserControllerTest {
     public void shouldNotGetAdminUserDto_bySingleUser() {
         final ResponseEntity<Response<Void>> response = restTemplate.exchange("/users/holyadmin",
             HttpMethod.GET,
-            prepareHttpEntity(null, getAccessToken("second@test.com", "testtest")),
+            prepareHttpEntity(null, getSingleUserAccessToken()),
             new ParameterizedTypeReference<Response<Void>>() {
             });
         final Response<Void> body = response.getBody();
@@ -149,7 +156,7 @@ class UserControllerTest {
     public void shouldGetOnlyOneDto_whenGetAll_bySingleUser() {
         final ResponseEntity<Response<List<UserDto>>> response = restTemplate.exchange("/users/all",
             HttpMethod.GET,
-            prepareHttpEntity(null, getAccessToken("second@test.com", "testtest")),
+            prepareHttpEntity(null, getSingleUserAccessToken()),
             new ParameterizedTypeReference<Response<List<UserDto>>>() {
             });
         final Response<List<UserDto>> body = response.getBody();
@@ -170,7 +177,7 @@ class UserControllerTest {
     public void shouldGetAllDtos_whenGetAll_byAdmin() {
         final ResponseEntity<Response<List<UserDto>>> response = restTemplate.exchange("/users/all",
             HttpMethod.GET,
-            prepareHttpEntity(null, getAccessToken("third@test.com", "testtest")),
+            prepareHttpEntity(null, getAdminAccessToken()),
             new ParameterizedTypeReference<Response<List<UserDto>>>() {
             });
         final Response<List<UserDto>> body = response.getBody();
@@ -179,17 +186,18 @@ class UserControllerTest {
         assertEquals("200", body.getCode());
         final List<UserDto> userDtos = body.getBody();
         assertNotNull(userDtos);
-        assertTrue(userDtos.size() >= 3);
+        assertEquals(3, userDtos.size());
         userDtos.forEach(Assert::assertNotNull);
     }
 
     @Test
+    @DirtiesContext
     public void shouldSignupAndActivate() {
         final String email = "newone@mail.com";
         final UserSignupRequest request = new UserSignupRequest();
         request.setEmail(email);
         request.setNickname("hellsamurai");
-        request.setPassword("Rhguslaa;;4");
+        request.setPassword("Rhguslaagg@4");
         request.setMatchingPassword(request.getPassword());
 
         final ResponseEntity<Response<Void>> signupResponse = restTemplate.exchange("/users/auth/signup",
@@ -218,6 +226,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DirtiesContext
     public void shouldChangePasword() {
         final String email = "second@test.com";
         final String newPassword = "kfjjUY8833@gga";
@@ -254,19 +263,21 @@ class UserControllerTest {
         assertNotNull(getAccessToken(email, newPassword));
     }
 
-    private String getAccessToken(String email, String password) {
-        when(loginAttemptRepository.countFailedLoginAttemptsLast30Mins(anyLong())).thenReturn(0L);
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        final MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("login", email);
-        body.add("password", password);
-        final HttpEntity<?> entity = new HttpEntity<>(body, headers);
-        ResponseEntity<?> response = restTemplate.exchange("/login", HttpMethod.POST, entity, Object.class, new Object());
-        return Optional.ofNullable(response.getHeaders().get("Set-Cookie"))
-            .flatMap(headerValues -> headerValues.stream()
-                .filter(value -> value.startsWith(TOKEN_NAME))
-                .findFirst())
-            .orElse(null);
+    @Test
+    @DirtiesContext
+    public void shouldUpdateInfo_byAuthenticated() {
+        final String info = "New info";
+        final UpdateUserInfoRequest request = new UpdateUserInfoRequest();
+        request.setInfo(info);
+        final ResponseEntity<Response<Void>> response = restTemplate.exchange("/users/update-info",
+            HttpMethod.POST,
+            prepareHttpEntity(request, getSingleUserAccessToken()),
+            new ParameterizedTypeReference<Response<Void>>() {
+            });
+        final Response<Void> body = response.getBody();
+        assertNotNull(body);
+        assertEquals("OK", body.getMessage());
+        assertEquals("200", body.getCode());
+        assertEquals(info, userRepository.getById(1000002L).getInfo());
     }
 }
