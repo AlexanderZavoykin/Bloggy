@@ -34,4 +34,14 @@ public class UserToken {
     private String token;
     @Column(name = "expiry_date", nullable = false)
     private LocalDateTime expiryDate;
+
+    @Override
+    public String toString() {
+        return "UserToken{" +
+            "id=" + id +
+            ", user.id=" + user.getId() +
+            ", token='" + token + '\'' +
+            ", expiryDate=" + expiryDate +
+            '}';
+    }
 }

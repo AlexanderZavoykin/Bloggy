@@ -21,6 +21,7 @@ import javax.persistence.SequenceGenerator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -55,4 +56,19 @@ public class Story {
     private String body;
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean rough;
+
+    @Override
+    public String toString() {
+        return "Story{" +
+            "id=" + id +
+            ", user.id=" + user.getId() +
+            ", tags.ids=" + tags.stream().map(Tag::getId).collect(Collectors.toList()) +
+            ", comments.ids=" + comments.stream().map(Comment::getId).collect(Collectors.toList()) +
+            ", created=" + created +
+            ", updated=" + updated +
+            ", title='" + title + '\'' +
+            ", body='" + body + '\'' +
+            ", rough=" + rough +
+            '}';
+    }
 }

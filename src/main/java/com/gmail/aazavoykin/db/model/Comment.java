@@ -35,4 +35,14 @@ public class Comment {
     private LocalDateTime created;
     @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String body;
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+            "id=" + id +
+            ", user.id=" + user.getId() +
+            ", created=" + created +
+            ", body='" + body + '\'' +
+            '}';
+    }
 }

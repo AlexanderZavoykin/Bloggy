@@ -16,6 +16,7 @@ import javax.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -38,5 +39,15 @@ public class Tag {
 
     public Tag(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Tag{" +
+            "id=" + id +
+            ", stories.ids=" + stories.stream().map(Story::getId).collect(Collectors.toList()) +
+            ", created=" + created +
+            ", name='" + name + '\'' +
+            '}';
     }
 }

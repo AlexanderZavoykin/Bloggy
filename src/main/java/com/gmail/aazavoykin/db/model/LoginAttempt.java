@@ -37,4 +37,14 @@ public class LoginAttempt {
     private LocalDateTime attempted;
     @Column(nullable = false)
     private boolean success;
+
+    @Override
+    public String toString() {
+        return "LoginAttempt{" +
+            "id=" + id +
+            ", user.id=" + user.getId() +
+            ", attempted=" + attempted +
+            ", success=" + success +
+            '}';
+    }
 }

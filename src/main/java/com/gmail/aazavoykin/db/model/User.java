@@ -26,6 +26,7 @@ import javax.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @Accessors(chain = true)
@@ -64,4 +65,20 @@ public class User {
     private String info;
     @Column(columnDefinition = "BOOLEAN", nullable = false)
     private boolean enabled;
+
+    @Override
+    public String toString() {
+        return "User{" +
+            "id=" + id +
+            ", stories.ids=" + stories.stream().map(Story::getId).collect(Collectors.toList()) +
+            ", comments.ids=" + comments.stream().map(Comment::getId).collect(Collectors.toList()) +
+            ", roles=" + roles +
+            ", email='" + email + '\'' +
+            ", password='" + password + '\'' +
+            ", nickname='" + nickname + '\'' +
+            ", registered=" + registered +
+            ", info='" + info + '\'' +
+            ", enabled=" + enabled +
+            '}';
+    }
 }
