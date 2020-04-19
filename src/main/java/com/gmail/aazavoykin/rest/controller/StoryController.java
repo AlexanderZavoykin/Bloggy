@@ -28,7 +28,7 @@ public class StoryController {
     private final CommentService commentService;
 
     @GetMapping("all")
-    public Response<List<StoryDto>> all(@RequestParam(required = false) String tagName) {
+    public Response<List<StoryDto>> all(@RequestParam(name = "tag", required = false) String tagName) {
         return Response.success(storyService.getAll(tagName));
     }
 

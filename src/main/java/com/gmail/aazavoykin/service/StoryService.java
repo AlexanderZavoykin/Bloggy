@@ -40,7 +40,7 @@ public class StoryService {
      */
     public List<StoryDto> getAll(String tagName) {
         final List<Story> stories = Optional.ofNullable(tagName)
-            .map(tn -> storyRepository.getAllByTags_NameIgnoreCase(tagName))
+            .map(tn -> storyRepository.getAllByRoughFalseAndTags_NameIgnoreCaseAndUser_EnabledTrue(tagName))
             .orElse(storyRepository.getAllByRoughFalseAndUser_EnabledTrueOrderByCreatedDesc());
         return storyMapper.storiesToStoryDtos(stories);
     }

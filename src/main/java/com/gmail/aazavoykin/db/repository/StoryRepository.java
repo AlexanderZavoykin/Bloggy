@@ -12,7 +12,7 @@ public interface StoryRepository extends JpaRepository<Story, Long> {
     Story getById(Long id);
     List<Story> getAllByRoughFalseAndUser_EnabledTrueOrderByCreatedDesc();
     List<Story> getTop10ByRoughFalseAndUser_EnabledTrueOrderByCreatedDesc();
-    List<Story> getAllByTags_NameIgnoreCase(String tagName);
+    List<Story> getAllByRoughFalseAndTags_NameIgnoreCaseAndUser_EnabledTrue(String tagName);
     List<Story> getAllByUserNicknameIgnoreCaseAndRoughFalse(String nickname);
     List<Story> getAllByUserNicknameIgnoreCase(String nickname);
 }
