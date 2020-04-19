@@ -6,6 +6,7 @@ import com.gmail.aazavoykin.rest.dto.UserDto;
 import com.gmail.aazavoykin.rest.request.ChangePasswordRequest;
 import com.gmail.aazavoykin.rest.request.ForgotPasswordRequest;
 import com.gmail.aazavoykin.rest.request.UpdateUserInfoRequest;
+import com.gmail.aazavoykin.rest.request.UserActivationRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.MailService;
@@ -25,7 +26,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -279,5 +282,37 @@ class UserControllerTest extends AbstractControllerTest {
         assertEquals("OK", body.getMessage());
         assertEquals("200", body.getCode());
         assertEquals(info, userRepository.getById(1000002L).getInfo());
+    }
+
+    @Test
+    public void shouldNotDesactivateUser_bySingleUser() {
+        final UserActivationRequest request = new UserActivationRequest();
+        request.setEnabled(false);
+        final ResponseEntity<Response<Void>> response = restTemplate.exchange("/users/charliesheen/enable",
+            HttpMethod.POST,
+            prepareHttpEntity(request, getSingleUserAccessToken()),
+            new ParameterizedTypeReference<Response<Void>>() {
+            });
+        final Response<Void> body = response.getBody();
+        assertNotNull(body);
+        assertEquals("Operation is not available for this user", body.getMessage());
+        assertEquals("E008", body.getCode());
+    }
+
+    @Test
+    @DirtiesContext
+    public void shouldDesactivateUser_byAdmin() {
+        final UserActivationRequest request = new UserActivationRequest();
+        request.setEnabled(false);
+        final ResponseEntity<Response<Void>> response = restTemplate.exchange("/users/charliesheen/enable",
+            HttpMethod.POST,
+            prepareHttpEntity(request, getAdminAccessToken()),
+            new ParameterizedTypeReference<Response<Void>>() {
+            });
+        final Response<Void> body = response.getBody();
+        assertNotNull(body);
+        assertEquals("OK", body.getMessage());
+        assertEquals("200", body.getCode());
+        assertFalse(userRepository.getByNicknameIgnoreCase("charliesheen").isEnabled());
     }
 }

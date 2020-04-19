@@ -5,6 +5,7 @@ spring:
     password: tst
     driver-class-name: org.h2.Driver
   jpa:
+#    data: data.sql
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
@@ -13,14 +14,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-  mail:
-    properties:
-      mail:
-        smtp:
-          auth: true
-          connectiontimeout: 10000
-          timeout: 10000
-          writetimeout: 10000
 
 server:
   port: 8090
@@ -42,24 +35,3 @@ app:
       lifetime: 3       # lifetime (in days) of registration activation URL sent to a new user
     forgotPassword:
       lifetime: 3       # lifetime (in days) of change password URL sent to a user
-
-email:
-  smtp:
-    host: smtp.mail.ru
-    port: 465
-  username: belymaniac@mail.ru
-  password: NegraTomasa1900
-  template:
-    auth:
-      activation:
-        subject: "[Bloggy] Activate your profile"
-        body: "Please, follow this link to activate your profile in Bloggy: %s"
-      registrationConfirmation:
-        subject: "[Bloggy] Successful registration"
-        body: "Congratulations! You have benn successfully registrated in Bloggy!"
-      resetPassword:
-        subject: "[Bloggy] Change your password"
-        body: "Please, follow this link to change your password: %s"
-      changePasswordSuccess:
-        subject: "[Bloggy] Your password is changed"
-        body: "Yo have successfully change your password"
