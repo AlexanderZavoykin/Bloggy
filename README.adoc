@@ -1,0 +1,44 @@
+== Bloggy - a simple blog engine
+This is my small pet project.
+The goal was to consolidate my skills and knowledges of Spring Framework when building web application.
+
+
+== Features
+=== Port
+Application will run on *port 8090*. It is adjustable value (look at *config/application.yml*)
+
+=== Database
+Before launching the application be sure to create database and enter its credentials at *config/application.yml*.
+
+=== Registration
+* One can sign up and get an email message with activation link which has it lifetime defined in *config/application.yml*
+
+=== Authentication
+* Authentication is based on login and password entering.
+Once they entered correctly the client obtains cookie with a token which lifetime is adjustable in config file.
+* Every time a user tries to authenticate in application his attempts are saved into data base.
+Once a user has entered his password incorrectly more then 3 times (this number can be changed in *config/application.yml*),
+he will be desactivated by application for 30 minutes (to be changed in *config/application.yml* too).
+* User who forgot his password can get a link for changing it by email. The lifetime of this link is adjustable.
+
+=== Authorization
+There are two user roles in application:
+
+==== USER
+* has nickname, short user`s info, email as login and password
+* can publish and update his stories
+* can see limited info (email will be hidden) of other activated users
+* can see not-rough stories of other activated users and comment them
+* can update his user`s info
+
+==== ADMIN
+* has nickname, short user`s info, email as login and password
+* can not publish or update stories
+* can see entire info of all users (activated or not)
+* can see not-rough stories of other users and comment them
+* can update his user`s info
+* can activate and desactivate users
+
+=== Logging
+Logback is used for logging to the console and to files at /var/log/bloggy.
+Be sure to permit write logs on this path or just change it in Logback`s config */config/logback.groovy*
