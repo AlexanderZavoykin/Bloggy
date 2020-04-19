@@ -45,6 +45,9 @@ public class CommentService {
             .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
         final Story story = Optional.ofNullable(storyRepository.getById(storyId))
             .orElseThrow(() -> new InternalException(InternalErrorType.STORY_NOT_FOUND));
+        if (story.isRough()) {
+            throw new InternalException(InternalErrorType.STORY_NOT_FOUND);
+        }
         story.getComments().add(new Comment()
             .setBody(commentBody)
             .setUser(user));
