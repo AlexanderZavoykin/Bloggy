@@ -10,8 +10,8 @@ import java.util.List;
 public interface StoryRepository extends JpaRepository<Story, Long> {
 
     Story getById(Long id);
-    List<Story> getAllByRoughFalseOrderByCreatedDesc();
-    List<Story> getTop10ByRoughFalseOrderByCreatedDesc();
+    List<Story> getAllByRoughFalseAndUser_EnabledTrueOrderByCreatedDesc();
+    List<Story> getTop10ByRoughFalseAndUser_EnabledTrueOrderByCreatedDesc();
     List<Story> getAllByTags_NameIgnoreCase(String tagName);
     List<Story> getAllByUserNicknameIgnoreCaseAndRoughFalse(String nickname);
     List<Story> getAllByUserNicknameIgnoreCase(String nickname);
