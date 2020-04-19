@@ -6,6 +6,7 @@ import com.gmail.aazavoykin.rest.dto.UserDto;
 import com.gmail.aazavoykin.rest.request.ChangePasswordRequest;
 import com.gmail.aazavoykin.rest.request.ForgotPasswordRequest;
 import com.gmail.aazavoykin.rest.request.UpdateUserInfoRequest;
+import com.gmail.aazavoykin.rest.request.UserActivationRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.rest.response.Response;
 import com.gmail.aazavoykin.service.CommentService;
@@ -78,6 +79,12 @@ public class UserController {
     @PostMapping("update-info")
     public Response<Void> updateInfo(@RequestBody UpdateUserInfoRequest request) {
         userService.updateInfo(request);
+        return Response.success();
+    }
+
+    @PostMapping("{nickname}/enable")
+    public Response<Void> desactivate(@PathVariable("nickname") String nickname, @RequestBody UserActivationRequest request) {
+        userService.enable(nickname, request);
         return Response.success();
     }
 }

@@ -15,6 +15,7 @@ import com.gmail.aazavoykin.rest.dto.mapper.ExtendedUserMapper;
 import com.gmail.aazavoykin.rest.dto.mapper.UserMapper;
 import com.gmail.aazavoykin.rest.request.ChangePasswordRequest;
 import com.gmail.aazavoykin.rest.request.UpdateUserInfoRequest;
+import com.gmail.aazavoykin.rest.request.UserActivationRequest;
 import com.gmail.aazavoykin.rest.request.UserSignupRequest;
 import com.gmail.aazavoykin.security.AppUser;
 import com.gmail.aazavoykin.util.ValidationUtils;
@@ -172,6 +173,18 @@ public class UserService {
         });
     }
 
+    @Transactional
+    public void enable(String nickname, UserActivationRequest request) {
+        AppUser.getCurrentUser().ifPresent(appUser -> {
+            if (!appUser.hasRole(Role.ADMIN)) {
+                throw new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE);
+            }
+            final User user = Optional.ofNullable(userRepository.getByNicknameIgnoreCase(nickname))
+                .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+            setEnabled(user.getId(), request.isEnabled());
+        });
+    }
+
     public Long insertLoginAttempt(Long userId, boolean success) {
         loginAttemptRepository.save(new LoginAttempt()
             .setUser(userRepository.getById(userId))
@@ -190,7 +203,6 @@ public class UserService {
             throw new InternalException(InternalErrorType.USER_ALREADY_EXISTS);
         }
     }
-
 
     private UserDto hideEmail(UserDto userDto) {
         final boolean isAdmin = AppUser.getCurrentUser().map(appUser -> appUser.hasRole(Role.ADMIN)).orElse(false);
