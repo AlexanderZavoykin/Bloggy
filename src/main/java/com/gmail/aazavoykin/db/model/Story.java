@@ -42,7 +42,7 @@ public class Story {
         inverseJoinColumns = @JoinColumn(name = "tag_id"), foreignKey = @ForeignKey(name = "story_tag_tag_fk"))
     private List<Tag> tags = new ArrayList<>();
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "story_id", foreignKey = @ForeignKey(name = "comment_story_fk"))
+    @JoinColumn(name = "story_id", foreignKey = @ForeignKey(name = "comment_story_fk"), nullable = false)
     private List<Comment> comments = new ArrayList<>();
     @CreationTimestamp
     @Column(nullable = false)
