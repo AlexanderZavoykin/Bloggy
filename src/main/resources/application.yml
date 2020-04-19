@@ -1,2 +1,2 @@
 logging:
-  config: classpath:logback.groovy
+  config: ./config/logback.groovy

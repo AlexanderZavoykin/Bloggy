@@ -3,7 +3,7 @@ import static java.nio.charset.Charset.forName
 def APP_NAME = 'bloggy'
 def ARCHIVE_FOLDER_NAME = APP_NAME + '-archive'
 
-def LOG_FILE_DIR = '/var/log/bloggy/'
+def LOG_FILE_DIR = '/home/alejandro/log/bloggy/'
 def ARCHIVE_FILES_DIR = LOG_FILE_DIR + ARCHIVE_FOLDER_NAME + '/%d{yyyy.MM.dd}/'
 
 def LOG_FILE_EXTENSION = '.log'
