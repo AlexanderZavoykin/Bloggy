@@ -36,33 +36,33 @@ VALUES (1000003, 'Rough story - not for publishing yet', '2020-03-31 12:31:38.33
 
 INSERT INTO tag
     (tag_id, created, name)
-VALUES (1000001, '2020-03-31 12:03:45.931', 'Java');
+VALUES (1000101, '2020-03-31 12:03:45.931', 'Java');
 
 INSERT INTO tag
     (tag_id, created, name)
-VALUES (1000002, '2020-03-31 12:03:45.931', 'Travel');
+VALUES (1000102, '2020-03-31 12:03:45.931', 'Travel');
 
 INSERT INTO tag
     (tag_id, created, name)
-VALUES (1000003, '2020-03-31 12:03:45.931', 'King Kong');
+VALUES (1000103, '2020-03-31 12:03:45.931', 'King Kong');
 
 INSERT INTO story_tag
     (story_id, tag_id)
-VALUES (1000001, 1000001);
+VALUES (1000001, 1000101);
 
 INSERT INTO story_tag
-(story_id, tag_id)
-VALUES (1000001, 1000002);
+    (story_id, tag_id)
+VALUES (1000001, 1000102);
 
 INSERT INTO story_tag
-(story_id, tag_id)
-VALUES (1000002, 1000002);
+    (story_id, tag_id)
+VALUES (1000002, 1000102);
 
 INSERT INTO story_tag
-(story_id, tag_id)
-VALUES (1000003, 1000003);
+    (story_id, tag_id)
+VALUES (1000003, 1000103);
 
 INSERT INTO comment
-(comment_id, body, created, user_id, story_id)
-VALUES(1000001, 'It`s awesome!', '2020-03-31 13:22:45.177', 1000002, 1000002);
+    (comment_id, body, created, user_id, story_id)
+VALUES (1000001, 'It`s awesome!', '2020-03-31 13:22:45.177', 1000002, 1000002);
 
