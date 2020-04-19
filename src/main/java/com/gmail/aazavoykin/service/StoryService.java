@@ -41,12 +41,12 @@ public class StoryService {
     public List<StoryDto> getAll(String tagName) {
         final List<Story> stories = Optional.ofNullable(tagName)
             .map(tn -> storyRepository.getAllByTags_NameIgnoreCase(tagName))
-            .orElse(storyRepository.getAllByRoughFalseOrderByCreatedDesc());
+            .orElse(storyRepository.getAllByRoughFalseAndUser_EnabledTrueOrderByCreatedDesc());
         return storyMapper.storiesToStoryDtos(stories);
     }
 
     public List<StoryDto> getLast10() {
-        return storyMapper.storiesToStoryDtos(storyRepository.getTop10ByRoughFalseOrderByCreatedDesc());
+        return storyMapper.storiesToStoryDtos(storyRepository.getTop10ByRoughFalseAndUser_EnabledTrueOrderByCreatedDesc());
     }
 
     /*
@@ -55,17 +55,15 @@ public class StoryService {
     public StoryDto getById(Long id) {
         final Story story = storyRepository.findById(id)
             .orElseThrow(() -> new InternalException(InternalErrorType.STORY_NOT_FOUND));
-        final StoryDto storyDto = storyMapper.storyToStoryDto(story);
         if (story.isRough()) {
-            AppUser.getCurrentUser().ifPresent(appUser -> {
-                final User user = userRepository.findById(appUser.getId())
-                    .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
-                if (!story.getUser().equals(user)) {
-                    throw new InternalException(InternalErrorType.STORY_NOT_FOUND);
-                }
-            });
+            final User user = AppUser.getCurrentUser()
+                .map(appUser -> userRepository.getById(appUser.getId()))
+                .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+            if (!story.getUser().equals(user) || !user.isEnabled()) {
+                throw new InternalException(InternalErrorType.STORY_NOT_FOUND);
+            }
         }
-        return storyDto;
+        return storyMapper.storyToStoryDto(story);
     }
 
     /*
@@ -99,6 +97,10 @@ public class StoryService {
         return AppUser.getCurrentUser().map(appUser -> {
             final User user = userRepository.findById(appUser.getId())
                 .orElseThrow(() -> new InternalException(InternalErrorType.USER_NOT_FOUND));
+            if (!user.getRoles().contains(Role.USER)) {
+                log.debug("Tried to save a story by user with id={} who has no USER role", user.getId());
+                throw new InternalException(InternalErrorType.OPERATION_NOT_AVAILABLE);
+            }
             final Story story = new Story();
             story.setUser(user);
             story.setTitle(request.getTitle());
